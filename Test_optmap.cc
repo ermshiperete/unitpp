@@ -2,13 +2,17 @@
 // Terms of use are in the file COPYING
 #include "unit++.h"
 #include "optmap.h"
+#ifdef HAVE_SSTREAM
 #include <sstream>
+#else
 #include <iostream>
+#endif
 using namespace std;
 using namespace unitpp;
 using namespace options_utils;
 namespace {
 const char* x[] = { "testing", "-i", "120", "-n100", "-t" };
+#ifdef HAVE_SSTREAM
 class hijack {
 	ostream& os;
 	streambuf* sbp;
@@ -22,6 +26,7 @@ public:
 	~hijack() { os.rdbuf(sbp); }
 	string str() { return sb.str(); }
 };
+#endif
 // The test suite for the optmap library
 class Test : public suite
 {
@@ -41,6 +46,7 @@ class Test : public suite
 		om.add("i", new opt_int(i));
 		om.add("n", new opt_int(n));
 		om.alias("number", "n");
+#ifdef HAVE_SSTREAM
 		string exp(
 			"usage: testing [ -t ] [ -i <int> ] [( -n | --number) <int> ]\n");
 		{
@@ -50,6 +56,7 @@ class Test : public suite
 			// ### this will be depend on map layout...
 			assert_eq("usage", exp, s.str());
 		}
+#endif
 	}
 	void args()
 	{

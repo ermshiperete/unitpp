@@ -3,7 +3,11 @@
 #include "unit++.h"
 #include "tester.h"
 #include "main.h"
+#ifdef HAVE_SSTREAM
 #include <sstream>
+#else
+#include <iostream>
+#endif
 using namespace std;
 using namespace unitpp;
 namespace {
@@ -49,10 +53,12 @@ class Test : public suite
 			assert_true("assert_true(false)", false);
 			ok = false;
 		} catch (assertion_error e) {
+#ifdef HAVE_SSTREAM
 			ostringstream oss;
 			oss << e;
 			assert_eq("assert_true(false) output",
 				"assert_true(false) [assertion failed]", oss.str());
+#endif
 		}
 		if (!ok)
 			fail("no exception from assert_true(false)");
@@ -60,10 +66,12 @@ class Test : public suite
 			assert_eq("assert_eq(int)", 5, 7);
 			ok = false;
 		} catch (assert_value_error<int,int> e) {
+#ifdef HAVE_SSTREAM
 			ostringstream oss;
 			oss << e;
 			assert_eq("assert_eq(int) output",
 				"assert_eq(int) [expected: `5' got: `7']", oss.str());
+#endif
 		}
 		if (!ok)
 			fail("no exception from assert_eq(int)");
@@ -78,8 +86,12 @@ class Test : public suite
 	{
 		out_of_range oor("negative");
 		assertion_error ae("test");
+#ifdef HAVE_SSTREAM
 		ostringstream os;
 		tester tst(os);
+#else
+		tester tst(cerr);
+#endif
 		root.visit(&tst);
 		assert_eq("tests ok", 3, tst.res_tests().n_ok());
 		assert_eq("tests error", 2, tst.res_tests().n_err());
