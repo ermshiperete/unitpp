@@ -24,7 +24,7 @@ all: $(TARGETLIB) test++
 $(TARGETLIB): $(OBJS)
 	ar r $@ $(OBJS)
 
-install:$(TARGETLIB) unit++.h
+install: all $(TARGETLIB) unit++.h
 	[ -d $(INSTLIBDIR) ] || mkdir -p $(INSTLIBDIR)
 	[ -d $(INSTINCDIR) ] || mkdir -p $(INSTINCDIR)
 	cp $(TARGETLIB) $(INSTLIBDIR)
