@@ -108,7 +108,7 @@ private:
  * of, and what ensures destruction.
  */
 class testcase {
-	std::size_t* cnt;
+	size_t* cnt;
 	test* tst;
 	void dec_cnt();
 public:
