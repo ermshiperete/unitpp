@@ -30,14 +30,14 @@ class Test : public suite
 	int argc;
 	void create()
 	{
-		optmap om(argc, argv);
+		optmap om;
 	}
 	void usage()
 	{
 		bool t_flg;
 		int i = 7;
 		int n = 0;
-		optmap om(argc, argv);
+		optmap om;
 		om.add("t", new opt_flag(t_flg));
 		om.add("i", new opt_int(i));
 		om.add("n", new opt_int(n));
@@ -46,6 +46,7 @@ class Test : public suite
 			"usage: testing [ -t ] [ -i <int> ] [( -n | --number) <int> ]\n");
 		{
 			hijack s(cerr);
+			om.parse(argc, argv);
 			om.usage(false);
 			// ### this will be depend on map layout...
 			assert_eq("usage", exp, s.str());
@@ -56,11 +57,11 @@ class Test : public suite
 		bool t_flg = false;
 		int i = 7;
 		int n = 0;
-		optmap om(argc, argv);
+		optmap om;
 		om.add("t", new opt_flag(t_flg));
 		om.add("i", new opt_int(i));
 		om.add("n", new opt_int(n));
-		assert_true("parse ok", om.parse());
+		assert_true("parse ok", om.parse(argc, argv));
 		assert_eq("get -i", 120, i);
 		assert_eq("get -n", 100, n);
 		assert_eq("got -t", true, t_flg);
@@ -71,12 +72,12 @@ class Test : public suite
 		size_t argc = sizeof(argv)/sizeof(argv[0]);
 		string s;
 		bool f_d, f_e, f_f;
-		optmap om(argc, argv);
+		optmap om;
 		om.add("a", new opt_string(s));
 		om.add("d", new opt_flag(f_d));
 		om.add("e", new opt_flag(f_e));
 		om.add("f", new opt_flag(f_f));
-		assert_true("parse", om.parse());
+		assert_true("parse", om.parse(argc, argv));
 		assert_eq("n", argc - 1, size_t(om.n()));
 	}
 public:

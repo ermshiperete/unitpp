@@ -7,8 +7,8 @@
 using namespace std;
 using namespace options_utils;
 
-optmap::optmap(int argc, const char** argv, const char* usage)
-: i(1), argc(argc), argv(argv), tail(usage)
+optmap::optmap(const char* usage)
+: i(1), prog("program"), tail(usage)
 {
 }
 
@@ -33,8 +33,11 @@ optmap& optmap::alias(const char* new_opt, const char* old_opt)
 		throw invalid_argument(string("no alias: ")+old_opt);
 	return add(new_opt, h);
 }
-bool optmap::parse()
+bool optmap::parse(int c, const char** v)
 {
+	argc = c;
+	argv = v;
+	prog = argv[0];
 	for (; i < argc; ++i) {
 		multichar = false;
 		const char* s = argv[i];
@@ -101,7 +104,7 @@ void optmap::usage(bool abort)
 			os << ' ' << arg;
 		os << " ]";
 	}
-	cerr << "usage: " << argv[0] << os.str()
+	cerr << "usage: " << prog << os.str()
 	<< (tail.size() ? " " : "") << tail << endl;
 	if (abort)
 		exit(1);

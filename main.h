@@ -15,8 +15,21 @@ int main(int argc, const char* argv[]);
 
 /// @name{unitpp}
 namespace unitpp {
-/// split the string by the char
-vector<string> vectorize(const string&, char);
+
+/**
+ * The singleton instance of the option handler of main.
+ *
+ * This allows a test to add its own flags to the resulting test program, in
+ * the following way.
+ * 
+ * #bool x_flg = false;#
+ * #unitpp::options().add("x", new options_utils::opt_flag(x_flg));#
+ *
+ * If a -x is now given to the resulting test it will set the #x_flg#
+ * variable;
+ */
+options_utils::optmap& options();
+
 /**
  * @name{run_test-id}
  * Run a test found in the suite::main() test by id. If id is empty run the

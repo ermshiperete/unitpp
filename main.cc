@@ -9,14 +9,13 @@ namespace {
 }
 int main(int argc, const char* argv[])
 {
-	options_utils::optmap opts(argc, argv, "[ testids... ]");
-	opts.add("v", new options_utils::opt_flag(verbose));
-	opts.alias("verbose", "v");
-	if (!opts.parse())
-		opts.usage();
+	options().add("v", new options_utils::opt_flag(verbose));
+	options().alias("verbose", "v");
+	if (!options().parse(argc, argv))
+		options().usage();
 	bool res = true;
-	if (opts.n() < argc)
-		for (int i = opts.n(); i < argc; ++i)
+	if (options().n() < argc)
+		for (int i = options().n(); i < argc; ++i)
 			res = res && run_test(argv[i]);
 	else
 		res = run_test();
@@ -24,6 +23,12 @@ int main(int argc, const char* argv[])
 }
 
 namespace unitpp {
+options_utils::optmap& options()
+{
+	static options_utils::optmap opts("[ testids... ]");
+	return opts;
+}
+
 bool run_test(const string& id)
 {
 	test* tp = suite::main().find(id);

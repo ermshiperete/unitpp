@@ -43,7 +43,7 @@ public:
 	 * copying of optmaps are not supported.
 	 * @param usage The tail of the usage string to follow the options
 	 */
-	optmap(int argc, const char** argv, const char* usage = "");
+	optmap(const char* usage = "");
 	~optmap();
 	/**
 	 * Adds an option that invokes the command handler.
@@ -68,7 +68,7 @@ public:
 	 * Parse the command line.
 	 * @return true if the parse is valid, false otherwise.
 	 */
-	bool parse();
+	bool parse(int argc, const char** argv);
 	/// Gets the index for the first non option argument
 	int n() { return i; }
 	/// display a usage string and abort()
@@ -77,6 +77,7 @@ public:
 	const char* get_arg();
 private:
 	int i;
+	const char* prog;
 	int argc;
 	const char** argv;
 	bool multichar;	// doing a multichar, -pdf --> -p -d -f
