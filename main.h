@@ -4,6 +4,8 @@
 #include "tester.h"
 #include "optmap.h"
 
+using namespace std;
+
 /**
  * The main of a test program that executes the main test suite and then
  * reports the summary.

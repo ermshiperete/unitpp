@@ -41,7 +41,7 @@ class tester : public visitor {
 	void write(test& t, std::exception& e);
 	void write(test& t, int dummy);
 public:
-	tester(ostream& os, bool verbose = false) : os(os), verbose(verbose) {}
+	tester(std::ostream& os, bool verbose = false) : os(os), verbose(verbose) {}
 	res_cnt res_tests() { return n_test; }
 	res_cnt res_suites() { return n_suite; }
 	virtual void summary();

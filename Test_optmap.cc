@@ -2,10 +2,9 @@
 // Terms of use are in the file COPYING
 #include "unit++.h"
 #include "optmap.h"
+#include <iostream>
 #ifdef HAVE_SSTREAM
 #include <sstream>
-#else
-#include <iostream>
 #endif
 using namespace std;
 using namespace unitpp;

@@ -57,7 +57,6 @@ public:
  * @see main
  */
 namespace unitpp {
-using std::string;
 
 class visitor;
 /**
@@ -69,11 +68,11 @@ class visitor;
 class test {
 	std::string nam;
 public:
-	test(const string& name) : nam(name) {}
+	test(const std::string& name) : nam(name) {}
 	virtual ~test() {}
 	virtual void operator()() = 0;
 	virtual void visit(visitor*);
-	virtual test* get_child(const string& id) { return 0; }
+	virtual test* get_child(const std::string& id) { return 0; }
 	std::string name() const { return nam; }
 };
 
@@ -84,7 +83,7 @@ template<typename C>
 class test_mfun : public test {
 public:
 	typedef void (C::*mfp)();
-	test_mfun(C* par, const string& name, mfp fp)
+	test_mfun(C* par, const std::string& name, mfp fp)
 		: test(name), par(par), fp(fp)
 	{}
 	virtual void operator()()
@@ -121,7 +120,7 @@ public:
 	 * \Ref{test_mfun}
 	 */
 	template<typename C>
-		testcase(C* par, const string& name, test_mfun<C>::mfp fp)
+		testcase(C* par, const std::string& name, test_mfun<C>::mfp fp)
 		: cnt(new size_t(1)), tst(new test_mfun<C>(par, name, fp))
 		{ }
 	~testcase();
@@ -185,10 +184,10 @@ class suite : public test {
 	std::vector<std::string> ids;
 	std::vector<testcase> tests;
 public:
-	suite(const string& name) : test(name) {}
+	suite(const std::string& name) : test(name) {}
 	virtual ~suite() {};
-	void add(const string& id, const testcase& t);
-	virtual test* get_child(const string& id);
+	void add(const std::string& id, const testcase& t);
+	virtual test* get_child(const std::string& id);
 	virtual void operator()() {}
 	void visit(visitor*);
 	// A singleton instance of the suite class
@@ -221,11 +220,11 @@ public:
 // The basic for all failed assert statements.
 class assertion_error : public std::exception
 {
-	string msg;
+	std::string msg;
 public:
-	assertion_error(const string& msg) : msg(msg) {}
-	string message() const { return msg; }
-	virtual ~assertion_error() {}
+	assertion_error(const std::string& msg) : msg(msg) {}
+	std::string message() const { return msg; }
+	virtual ~assertion_error() throw () {}
 	/**
 	 * @name assertion_error::out
 	 * The virtual method used for operator>>.
@@ -239,29 +238,30 @@ class assert_value_error : public assertion_error
 	T1 exp;
 	T2 got;
 public:
-	assert_value_error(const string& msg, T1& exp, T2& got)
+	assert_value_error(const std::string& msg, T1& exp, T2& got)
 	: assertion_error(msg), exp(exp), got(got)
 	{
 	}
+	virtual ~assert_value_error() throw () {}
 	virtual void out(std::ostream& os) const
 	{
 		os << message() << " [expected: `" << exp << "' got: `" << got << "']";
 	}
 };
 /// The test was not succesful.
-inline void fail(const string& msg)
+inline void fail(const std::string& msg)
 {
 	throw assertion_error(msg);
 }
 /// Assert that the assertion is true, that is fail #if (!assertion) ...#
-template<class A> inline void assert_true(const string& msg, A assertion)
+template<class A> inline void assert_true(const std::string& msg, A assertion)
 {
 	if (!assertion)
 		throw assertion_error(msg);
 }
 /// Assert that the two arguments are equal in the #==# sense.
 template<class T1, class T2>
-	inline void assert_eq(const string& msg, T1 exp, T2 got)
+	inline void assert_eq(const std::string& msg, T1 exp, T2 got)
 {
 	if (!(exp == got))
 		throw assert_value_error<T1,T2>(msg, exp, got);

@@ -5,6 +5,7 @@
 #include "unit++.h"
 
 using namespace unitpp;
+using namespace std;
 
 void test::visit(visitor* v)
 {
@@ -85,5 +86,5 @@ void suite::visit(visitor* v)
 
 void unitpp::assertion_error::out(ostream& os) const
 {
-	os << msg << " [assertion failed]";
+	os << msg << string(" [assertion failed]");
 }

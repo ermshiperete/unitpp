@@ -35,7 +35,7 @@ public:
 		 */
 		virtual bool do_cmd(optmap* om) = 0;
 		/// return the name of the argument needed by \Ref{usage}
-		virtual string arg() { return string(); }
+		virtual std::string arg() { return std::string(); }
 		virtual ~cmd() {}
 	};
 	/**
@@ -84,11 +84,11 @@ private:
 	bool first_multi;
 	optmap(const optmap& o);
 	optmap& operator=(const optmap&);
-	bool do_cmd(const string& opt);
+	bool do_cmd(const std::string& opt);
 	std::string tail;
 	typedef std::map<std::string, cmd*> cmds_t;
 	cmds_t cmds;
-	typedef std::map<cmd*, vector<string> > group_t;
+	typedef std::map<cmd*, std::vector<std::string> > group_t;
 	group_t group;
 };
 
@@ -106,15 +106,15 @@ class opt_int : public optmap::cmd {
 public:
 	opt_int(int& val) : val(val) {}
 	virtual bool do_cmd(optmap* om);
-	virtual string arg() { return string("<int>"); }
+	virtual std::string arg() { return std::string("<int>"); }
 };
 /// A cmd handler for a string
 class opt_string : public optmap::cmd {
-	string& val;
+	std::string& val;
 public:
-	opt_string(string& val) : val(val) {}
+	opt_string(std::string& val) : val(val) {}
 	virtual bool do_cmd(optmap* om);
-	virtual string arg() { return string("<string>"); }
+	virtual std::string arg() { return std::string("<string>"); }
 };
 }
 #endif
