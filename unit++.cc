@@ -3,7 +3,6 @@
 #include <algorithm>
 #include <functional>
 #include "unit++.h"
-#include "asserter.h"
 
 using namespace unitpp;
 
@@ -82,4 +81,9 @@ void suite::visit(visitor* v)
 	for_each(tests.begin(), tests.end(),
 		bind2nd(mem_fun_ref(&testcase::visit), v));
 	v->visit(*this, 0);
+}
+
+void unitpp::assertion_error::out(ostream& os) const
+{
+	os << msg << " [assertion failed]";
 }

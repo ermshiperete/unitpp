@@ -5,7 +5,7 @@
 #include <vector>
 #include <string>
 #include <map>
-#include "asserter.h"
+#include "optmap.h"
 /**
  * The unitpp name space holds all the stuff needed to use the unit++ testing
  * framework.
@@ -218,10 +218,77 @@ public:
 	virtual void visit(suite&, int dummy) = 0; // post childs
 };
 
-class info {
+// The basic for all failed assert statements.
+class assertion_error : public std::exception
+{
+	string msg;
 public:
-	virtual std::vector<std::string> msg();
+	assertion_error(const string& msg) : msg(msg) {}
+	string message() const { return msg; }
+	virtual ~assertion_error() {}
+	/**
+	 * @name assertion_error::out
+	 * The virtual method used for operator>>.
+	 */
+	virtual void out(std::ostream& os) const;
 };
+// A value comparison has failed, exception keeps expected/got.
+template<class T1, class T2>
+class assert_value_error : public assertion_error
+{
+	T1 exp;
+	T2 got;
+public:
+	assert_value_error(const string& msg, T1& exp, T2& got)
+	: assertion_error(msg), exp(exp), got(got)
+	{
+	}
+	virtual void out(std::ostream& os) const
+	{
+		os << message() << " [expected: `" << exp << "' got: `" << got << "']";
+	}
+};
+/// The test was not succesful.
+inline void fail(const string& msg)
+{
+	throw assertion_error(msg);
+}
+/// Assert that the assertion is true, that is fail #if (!assertion) ...#
+template<class A> inline void assert_true(const string& msg, A assertion)
+{
+	if (!assertion)
+		throw assertion_error(msg);
+}
+/// Assert that the two arguments are equal in the #==# sense.
+template<class T1, class T2>
+	inline void assert_eq(const string& msg, T1 exp, T2 got)
+{
+	if (!(exp == got))
+		throw assert_value_error<T1,T2>(msg, exp, got);
+}
+/*
+ * Put an assertion error to a stream, using the out method.
+ * \Ref{assertion_error::out}
+ */
+inline std::ostream& operator<<(std::ostream& os, const unitpp::assertion_error& a)
+{
+	a.out(os);
+	return os;
+}
+
+/**
+ * The singleton instance of the option handler of main.
+ *
+ * This allows a test to add its own flags to the resulting test program, in
+ * the following way.
+ * 
+ * #bool x_flg = false;#
+ * #unitpp::options().add("x", new options_utils::opt_flag(x_flg));#
+ *
+ * If a -x is now given to the resulting test it will set the #x_flg#
+ * variable;
+ */
+options_utils::optmap& options();
 
 }
 

@@ -1,0 +1,11 @@
+The unit++ framework is meant to be very simple.
+
+To install it simply edit the Makefile to suite your needs with regards to
+install target, and C++ compiler. The default is to use g++, and to install
+in /usr/local/{lib,include}.
+
+If you have doc++ available the API interface can be documented by `make
+doc'. The DOCDIR variable in the Makefile controls where the files end up.
+
+If you want the documentation without having doc++, I try to keep it update
+on the SourceForge page: http://unitpp.sourceforge.net/docs/index.html.

@@ -4,7 +4,6 @@
 #define _UNITPP_TESTER_H
 #include <stack>
 #include "unit++.h"
-#include "asserter.h"
 namespace unitpp {
 /// A mostly internal class for keeping score.
 class res_cnt {
