@@ -14,9 +14,9 @@ test case, try `unit++ -f'.
 Graphics
 --------
 
-My experience from junit are that a really great days ends with my test suite
-produce that green bar... To gain that joy in C++ I have made a GUI for
-unit++ based on Qt. However, it does take longer to run the GUI version, and
+My experience from junit are that a really great day ends with my test suite
+producing that green bar... To gain that joy in C++ I have made a GUI for
+unit++ based on Qt. However, it does take longer to run the unGUI version, and
 I have therefore taken great care that this will still work without it.
 
 The install instructions for the GUI version is:
