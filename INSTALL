@@ -1,8 +1,14 @@
 The unit++ framework is meant to be very simple.
 
-To install it simply edit the Makefile to suite your needs with regards to
-install target, and C++ compiler. The default is to use g++, and to install
-in /usr/local/{lib,include}.
+To install it:
+  ./configure
+  make install
+
+This should take care of everything, and install in /usr/local/{lib,include}.
+
+The all target (make all) will make the test for the test framework, test++.
+Try to run it to see that everything is fine. If you want to see a failing
+test case, try `test++ -f'.
 
 If you have doc++ available the API interface can be documented by `make
 doc'. The DOCDIR variable in the Makefile controls where the files end up.

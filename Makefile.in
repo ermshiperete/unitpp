@@ -1,10 +1,10 @@
 # installation targets
-INSTDIR=/usr/local
-INSTLIBDIR=$(INSTDIR)/lib
-INSTINCDIR=$(INSTDIR)/include
-DOCDIR=./html/unit++
+prefix=@prefix@
+includedir=@includedir@
+libdir=@LIBDIR@
+docdir=./html/unit++
 #various compilers.
-CXX=g++
+CXX=@CXX@
 CXXFLAGS=-Wall
 # for those that have doc++, otherwise get it
 DOC=doc++
@@ -19,12 +19,17 @@ DOCOPTS=-d $(DOCDIR)
 TSTOBJS=Test_unit++.o Test_optmap.o
 TSTLIBS=-L. -lunit++
 
+.SUFFIXES: .cc
+
+.cc.o:
+	$(CXX) -c $(CXXFLAGS) $(CPPFLAGS) -o $@ $<
+
 all: $(TARGETLIB) test++
 
 $(TARGETLIB): $(OBJS)
 	ar r $@ $(OBJS)
 
-install: all $(TARGETLIB) unit++.h
+install: $(TARGETLIB) unit++.h
 	[ -d $(INSTLIBDIR) ] || mkdir -p $(INSTLIBDIR)
 	[ -d $(INSTINCDIR) ] || mkdir -p $(INSTINCDIR)
 	cp $(TARGETLIB) $(INSTLIBDIR)
