@@ -14,7 +14,7 @@
  * The normal way to make a test is like this:
  *
 \begin{verbatim}
-#include<unit++.h>
+#include<unit++/unit++.h>
 using namespace unitpp;
 // use anonymous namespace so all test classes can be named Test
 namespace {
@@ -156,15 +156,7 @@ public:
 		: test(static_cast<const test&>(tc).name()), tc(tc) {}
 	~exception_test() {}
 	/// Runs the wrapped test, and fails unless the correct exception is thrown.
-	virtual void operator()()
-	{
-		try {
-			(static_cast<test&>(tc))();
-			fail("unexpected lack of exception");
-		} catch (E& ) {
-			// fine!
-		}
-	}
+	virtual void operator()();
 private:
 	testcase tc;
 };
@@ -286,6 +278,16 @@ public:
 inline void fail(const std::string& msg)
 {
 	throw assertion_error(msg);
+}
+template<typename E>
+void exception_test<E>::operator()()
+{
+	try {
+		(static_cast<test&>(tc))();
+		fail("unexpected lack of exception");
+	} catch (E& ) {
+		// fine!
+	}
 }
 /// Assert that the assertion is true, that is fail #if (!assertion) ...#
 template<class A> inline void assert_true(const std::string& msg, A assertion)

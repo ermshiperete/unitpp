@@ -1,6 +1,7 @@
 # installation targets
 prefix=@prefix@
 includedir=@includedir@
+exec_prefix=@exec_prefix@
 libdir=@libdir@
 mandir=@mandir@
 docdir=./html/unit++
@@ -18,7 +19,7 @@ GUI_DOCSRC = @gui_docsrc@
 
 # Below here should not need modification
 TARGETLIB=libunit++.a
-TARGETHEADERS=unit++.h optmap.h
+TARGETHEADERS=unit++.h optmap.h gui.h guitester.h main.h tester.h
 # substituted into GUI_OBJS by autoconf, if GUI is enabled
 gui_objs = gui.o guitester.o moc_gui.o moc_guitester.o
 gui_docsrc = gui.h guitester.h
@@ -32,20 +33,22 @@ TSTLIBS=-L. -lunit++
 .SUFFIXES: .cc
 
 .cc.o:
-	$(CXX) -c $(CXXFLAGS) $(CPPFLAGS) @QT_INCLUDES@ @DEFS@ -o $@ $<
+	$(CXX) -D__UNITPP -c $(CXXFLAGS) $(CPPFLAGS) @QT_INCLUDES@ @DEFS@ -o $@ $<
 
 all: $(TARGETLIB) unit++
 
 $(TARGETLIB): $(OBJS)
 	ar r $@ $(OBJS)
 
-install: $(TARGETLIB) unit++.h
+install: $(TARGETLIB) $(TARGETHEADERS)
 	[ -d $(libdir) ] || mkdir -p $(libdir)
-	[ -d $(includedir) ] || mkdir -p $(includedir)
+	[ -d $(includedir)/unit++ ] || mkdir -p $(includedir)/unit++
 	[ -d $(mandir)/man1 ] || mkdir -p $(mandir)/man1
 	[ -d $(mandir)/man3 ] || mkdir -p $(mandir)/man3
 	cp $(TARGETLIB) $(libdir)
-	cp $(TARGETHEADERS) $(includedir)
+	cp $(TARGETHEADERS) $(includedir)/unit++
+	cp unit++-compat.h $(includedir)/unit++.h
+	cp optmap-compat.h $(includedir)/optmap.h
 	cp unit++.1 $(mandir)/man1
 	cp unit++.3 $(mandir)/man3
 

@@ -3,7 +3,11 @@
 #ifndef _UNITPP_TESTER_H
 #define _UNITPP_TESTER_H
 #include <stack>
+#ifdef __UNITPP
 #include "unit++.h"
+#else
+#include <unit++/unit++.h>
+#endif
 namespace unitpp {
 /// A mostly internal class for keeping score.
 class res_cnt {

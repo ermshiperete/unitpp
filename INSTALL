@@ -27,7 +27,7 @@ This will enable the gui, that is add the GUI classes to the unit++ library.
 It still requires that the individual test programs enables the GUI. This is
 done by adding the following lines to one of the test modules:
 
-#include <unit++.h>
+#include <unit++/unit++.h>
 unitpp::gui_hook ghook;
 
 This will enable the -g (or --gui) option in the resulting executable.

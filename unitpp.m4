@@ -26,14 +26,14 @@ AC_DEFUN(AM_PATH_UNITPP,
 	LIBS="$LIBS $UNITPP_LIBS"
 	
 	if test $enable_unitpp="yes"; then
-		AC_CHECK_HEADER(unit++.h,
+		AC_CHECK_HEADER(unit++/unit++.h,
 				[ac_check_unitpp="yes"],
 				[ac_check_unitpp="no"] )
 		
 		if test $ac_check_unitpp="yes"; then
 			AC_MSG_CHECKING(if unit++ test program compiles)
 			AC_TRY_LINK(
-				[ #include<unit++.h> ],
+				[ #include<unit++/unit++.h> ],
 				[ unitpp::test* test_test = new unitpp::suite("Test Suite"); ],
 				[ac_check_unitpp="yes"
 				AC_MSG_RESULT(yes) ],

@@ -5,9 +5,7 @@
 using namespace std;
 using namespace unitpp;
 
-namespace { 
-	bool verbose;
-}
+bool unitpp::verbose = false;
 
 test_runner* runner = 0;
 
@@ -29,7 +27,7 @@ int main(int argc, const char* argv[])
 	plain_runner plain;
 	if (!runner)
 		runner = &plain;
-	return runner->run_tests(argc, argv, options().n()) ? 0 : 1;
+	return runner->run_tests(argc, argv) ? 0 : 1;
 }
 
 namespace unitpp {
@@ -39,7 +37,7 @@ options_utils::optmap& options()
 	return opts;
 }
 
-bool plain_runner::run_tests(int argc, const char** argv, int i)
+bool plain_runner::run_tests(int argc, const char** argv)
 {
 	bool res = true;
 	if (options().n() < argc)

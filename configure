@@ -916,7 +916,7 @@ ac_abs_top_srcdir=`cd "$ac_dir" && cd $ac_top_srcdir && pwd`
     else
       echo "$as_me: WARNING: no configuration information is in $ac_dir" >&2
     fi
-    cd $ac_popdir
+    cd "$ac_popdir"
   done
 fi
 
@@ -1115,7 +1115,7 @@ _ASBOX
       echo "$as_me: caught signal $ac_signal"
     echo "$as_me: exit $exit_status"
   } >&5
-  rm -f core core.* *.core &&
+  rm -f core *.core &&
   rm -rf conftest* confdefs* conf$$* $ac_clean_files &&
     exit $exit_status
      ' 0
@@ -1860,7 +1860,7 @@ if test "${ac_cv_have_qt+set}" = set; then
 else
   #try to guess Qt locations
 
-qt_incdirs="$QTINC /usr/lib/qt/include /usr/local/qt/include /usr/include/qt /usr/include /usr/lib/qt2/include /usr/X11R6/include/X11/qt $x_includes"
+qt_incdirs="$QTINC /usr/lib/qt/include /usr/local/qt/include /usr/include/qt3 /usr/include/qt /usr/include /usr/lib/qt2/include /usr/X11R6/include/X11/qt $x_includes"
 test -n "$QTDIR" && qt_incdirs="$QTDIR/include $QTDIR $qt_incdirs"
 qt_incdirs="$ac_qt_includes $qt_incdirs"
 
@@ -1915,8 +1915,6 @@ cat > conftest.$ac_ext <<EOF
 #include "confdefs.h"
 #include <qglobal.h>
 #include <qapplication.h>
-#include <qapp.h>
-#include <qobjcoll.h>
 #include <qstyle.h>
 
 int main() {
@@ -2053,8 +2051,8 @@ fi
      if test -n "$ac_cv_path_moc"; then
        output=`eval "$ac_cv_path_moc --help 2>&1 | sed -e '1q' | grep Qt"`
      fi
-     echo "configure:2056: tried to call $ac_cv_path_moc --help 2>&1 | sed -e '1q' | grep Qt" >&5
-     echo "configure:2057: moc output: $output" >&5
+     echo "configure:2054: tried to call $ac_cv_path_moc --help 2>&1 | sed -e '1q' | grep Qt" >&5
+     echo "configure:2055: moc output: $output" >&5
 
      if test -z "$output"; then
        { { echo "$as_me:$LINENO: error: No Qt meta object compiler (moc) found!
@@ -2490,7 +2488,7 @@ sed 's/^/| /' conftest.$ac_ext >&5
 ( exit $ac_status )
 ac_cv_header_stdc=no
 fi
-rm -f core core.* *.core gmon.out bb.out conftest$ac_exeext conftest.$ac_objext conftest.$ac_ext
+rm -f core *.core gmon.out bb.out conftest$ac_exeext conftest.$ac_objext conftest.$ac_ext
 fi
 fi
 fi

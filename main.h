@@ -15,6 +15,13 @@ int main(int argc, const char* argv[]);
 
 /// @name{unitpp}
 namespace unitpp {
+
+/**
+ * The verbose flag, in case somebody wants to piggyback it with more
+ * meaning.
+ */
+extern bool verbose;
+
 /**
  * A runner is the base class for the objects that actually processes the
  * tests from main. Main simply invokes the run_tests method of the current
@@ -25,9 +32,9 @@ class test_runner {
 public:
 	virtual ~test_runner();
 	/**
-	 * run all the tests with arguments in the argc, argv set, starting at i.
+	 * run all the tests with arguments in the argc, argv set
 	 */
-	virtual bool run_tests(int argc, const char** argv, int i) = 0;
+	virtual bool run_tests(int argc, const char** argv) = 0;
 };
 /**
  * Sets the test_runner to be used in testing. This hook allows another
@@ -39,7 +46,7 @@ void set_tester(test_runner*);
 class plain_runner : public test_runner {
 public:
 	/// Run the tests specified in argv, starting at i.
-	virtual bool run_tests(int argc, const char** argv, int i);
+	virtual bool run_tests(int argc, const char** argv);
 private:
 /**
  * Run a test found in the suite::main() test by id. If id is empty run the

@@ -81,8 +81,6 @@ cat > conftest.$ac_ext <<EOF
 #include "confdefs.h"
 #include <qglobal.h>
 #include <qapplication.h>
-#include <qapp.h>
-#include <qobjcoll.h>
 #include <qstyle.h>
 
 int main() {
@@ -131,7 +129,7 @@ AC_ARG_WITH(qt-libraries,
 AC_CACHE_VAL(ac_cv_have_qt,
 [#try to guess Qt locations
 
-qt_incdirs="$QTINC /usr/lib/qt/include /usr/local/qt/include /usr/include/qt /usr/include /usr/lib/qt2/include /usr/X11R6/include/X11/qt $x_includes"
+qt_incdirs="$QTINC /usr/lib/qt/include /usr/local/qt/include /usr/include/qt3 /usr/include/qt /usr/include /usr/lib/qt2/include /usr/X11R6/include/X11/qt $x_includes"
 test -n "$QTDIR" && qt_incdirs="$QTDIR/include $QTDIR $qt_incdirs"
 qt_incdirs="$ac_qt_includes $qt_incdirs"
 AC_FIND_FILE(qstyle.h, $qt_incdirs, qt_incdir)

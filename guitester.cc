@@ -8,7 +8,7 @@ using namespace unitpp;
 using namespace std;
 
 class gui_test_runner : public test_runner {
-	virtual bool run_tests(int argc, const char** argv, int)
+	virtual bool run_tests(int argc, const char** argv)
 	{
 		QApplication a(argc, const_cast<char**>(argv));
 		gui g(a);
