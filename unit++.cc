@@ -44,10 +44,30 @@ suite& suite::main()
 }
 test* suite::get_child(const string& id)
 {
-	vector<string>::iterator p = find(ids.begin(), ids.end(), id);
+	vector<string>::iterator p = std::find(ids.begin(), ids.end(), id);
 	if (p != ids.end())
 		return &(static_cast<test&>(tests[p - ids.begin()]));
 	return 0;
+}
+vector<string> unitpp::vectorize(const string& str, char c)
+{
+	vector<string> res;
+	string::const_iterator s, p;
+	for (s = str.begin(); s != str.end(); ) {
+		p = find(s, str.end(), c);
+		res.push_back(string(s, p));
+		s = (p == str.end()) ? p : p + 1;
+	}
+	return res;
+}
+test* suite::find(const string& id)
+{
+	vector<string> ss(vectorize(id, '.'));
+	test* tp = this;
+	for (vector<string>::iterator p = ss.begin(); p != ss.end(); ++p)
+		if (!(tp = tp->get_child(*p)))
+			break;
+	return tp;
 }
 void suite::add(const string& id, const testcase& t)
 {

@@ -33,7 +33,7 @@ public:
 		// any setup you need
 		add("id1", testcase(this, "Test 1", &Test::test1));
 		// make a testcase from the method
-		testcase tc(this, "Test 2", &Test::test1);
+		testcase tc(this, "Test 2", &Test::test2);
 		// add a testcase that expects the exception
 		add("id2", exception_case<out_of_range>(tc));
 		// add the suite to the global test suite
@@ -170,6 +170,12 @@ testcase exception_case(const testcase& tc)
 }
 
 /**
+ * Splits the string by char c. Each c will generate a new element in the
+ * vector, including leading and trailing c.
+ */
+extern std::vector<std::string> vectorize(const std::string& str, char c);
+
+/**
  * A suite is a test that happens to be a collection of tests. This is an
  * implementation of the Composite pattern.
  */
@@ -185,6 +191,8 @@ public:
 	void visit(visitor*);
 	// A singleton instance of the suite class
 	static suite& main();
+	/// splits the string by `.' and uses each token as a test id
+	test* find(const std::string& id);
 };
 
 /**

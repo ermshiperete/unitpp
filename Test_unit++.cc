@@ -125,7 +125,15 @@ class Test : public suite
 		assert_eq("v[2]", string("three"), v[2]);
 		assert_eq("size", size_t(3), v.size());
 	}
+	void find()
+	{
+		test* tp = root.find("s2.s21.t210");
+		assert_eq("t210", t210, tp);
+		tp = root.find("s1.s21");
+		assert_eq("bad mid", static_cast<test*>(0), tp);
+	}
 	suite root;
+	test* t210;
 public:
 	Test() : suite("Unit++ test suite"), root("The root")
 	{
@@ -139,7 +147,7 @@ public:
 		s1->add("t11", new test_test("T11"));
 		s2->add("t20", new test_test("T20", test_test::error));
 		s2->add("t22", new test_test("T22", test_test::exotic));
-		s21->add("t210", new test_test("T210"));
+		s21->add("t210", t210 = new test_test("T210"));
 		s21->add("t211", new test_test("T211", test_test::fail));
 		// 
 		// Adding testcases
@@ -153,6 +161,7 @@ public:
 		add("id_get", testcase(this, "Get by id", &Test::get_by_id));
 		add("vec", testcase(this, "Vectorize", &Test::vec));
 		add("empty_vec", testcase(this, "Vectorize empty", &Test::empty_vec));
+		add("find", testcase(this, "find", &Test::find));
 	}
 } * theTest = new Test();
 
