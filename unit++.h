@@ -120,7 +120,7 @@ public:
 	 * \Ref{test_mfun}
 	 */
 	template<typename C>
-		testcase(C* par, const std::string& name, test_mfun<C>::mfp fp)
+		testcase(C* par, const std::string& name, typename test_mfun<C>::mfp fp)
 		: cnt(new size_t(1)), tst(new test_mfun<C>(par, name, fp))
 		{ }
 	~testcase();
@@ -158,7 +158,7 @@ private:
  *
  * #testcase tc(this, "Test name", &Test::test);#
  *
- * #add("ex", exception_case<out_of_range>(tc));
+ * #add("ex", exception_case<out_of_range>(tc));#
  *
  * The name of the exception_case is copied from the wrapped testcase, and
  * the exception_case will execute the tc test case and report a failure
