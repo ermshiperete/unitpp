@@ -136,9 +136,17 @@ class Test : public suite
 	}
 	suite root;
 	test* t210;
+	bool do_fail;
+	void fail_on_flag()
+	{
+		assert_true("Fail option not set", !do_fail);
+	}
 public:
 	Test() : suite("Unit++ test suite"), root("The root")
 	{
+		do_fail = false;
+		options().add("f", new options_utils::opt_flag(do_fail));
+		options().alias("fail", "f");
 		suite* s1;
 		suite* s2;
 		suite* s21;
@@ -164,6 +172,7 @@ public:
 		add("vec", testcase(this, "Vectorize", &Test::vec));
 		add("empty_vec", testcase(this, "Vectorize empty", &Test::empty_vec));
 		add("find", testcase(this, "find", &Test::find));
+		add("fail", testcase(this, "fail on option", &Test::fail_on_flag));
 	}
 } * theTest = new Test();
 

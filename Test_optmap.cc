@@ -1,7 +1,6 @@
 // Copyright (C) 2001 Claus Dræby
 // Terms of use are in the file COPYING
 #include "unit++.h"
-#include "tester.h"
 #include "optmap.h"
 #include <sstream>
 #include <iostream>
@@ -79,6 +78,7 @@ class Test : public suite
 		om.add("f", new opt_flag(f_f));
 		assert_true("parse", om.parse(argc, argv));
 		assert_eq("n", argc - 1, size_t(om.n()));
+		assert_eq("a", "bc", s);
 	}
 public:
 	Test() : suite("optmap test suite")
