@@ -36,8 +36,10 @@ private:
 	QLabel* label;
 	cnt_item* cnts[4];
 public slots:
-	void set(const res_cnt& r) {}
 	void max(int v);
+	void ok();
+	void fail();
+	void error();
 public:
 	cnt_line(const QString& txt, QWidget* par = 0, const char* name = 0);
 };
@@ -50,9 +52,13 @@ private:
 	QProgressBar* bar;
 public slots:
 	void max(int max);
+	void ok();
+	void fail();
+	void error();
 public:
 	res_stack(const QString& txt, QWidget* par=0, const char* name=0);
 };
+class node;
 class gui : public QVBox
 {
 	Q_OBJECT
@@ -60,19 +66,28 @@ public:
 	gui(QApplication& app, QWidget* par = 0, const char* name = 0);
 	virtual ~gui();
 	QListView* test_tree() { return tree; }
+	void add_suite(node*);
+	void add_test(node*);
 	void processEvents(int t);
+signals:
+	void run();
+	void stop();
 public slots:
 	void totSuites(int v);
 	void totTests(int v);
+private slots:
+	void run_pressed() { emit run(); }
+	void stop_pressed() { emit stop(); }
 private:
 	QApplication& app;
 	QListView* tree;
 	res_stack* suites;
 	res_stack* tests;
-	QPushButton* run;
-	QPushButton* stop;
-	QPushButton* quit;
+	QPushButton* b_run;
+	QPushButton* b_stop;
+	QPushButton* b_quit;
 };
+// a Qt error prevents this from being a ListViewItem...
 class node : public QObject
 {
 	Q_OBJECT

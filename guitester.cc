@@ -35,17 +35,29 @@ gui_hook::gui_hook()
 	options().alias("gui", "g");
 }
 
+g_setup::g_setup(gui* gp) : gp(gp), running(false), n_suites(0), n_tests(0)
+{
+	connect(gp, SIGNAL(run()), this, SLOT(run()));
+}
+void g_setup::add_node(node* np)
+{
+	nodes.push_back(np);
+	rev[np->lvi()] = np;
+}
 void g_setup::visit(test& t)
 {
 	++n_tests;
-	nodes.push_back(new node(branch.top(), t));
+	node* np = new node(branch.top(), t);
+	add_node(np);
+	gp->add_test(np);
 }
 void g_setup::visit(suite& t)
 {
 	++n_suites;
 	node* np = branch.size() ? new node(branch.top(), t) : new node(gp, t);
 	branch.push(np);
-	nodes.push_back(np);
+	add_node(np);
+	gp->add_suite(np);
 }
 void g_setup::visit(suite& t, int)
 {
@@ -58,13 +70,18 @@ void g_setup::visit(suite& t, int)
 
 void g_setup::run()
 {
+	cout << "g_setup::run" << endl;
 	if (running)
 		return;
 	running = true;
 	selected.clear();
 	find_selected(gp->test_tree()->firstChild());
+	cout << "g_setup::run found " << selected.size() << endl;
 	for (vector<node*>::iterator p = selected.begin(); p!=selected.end(); ++p) {
+		cout << "looping..." << endl;
+		cout << "looping *p=" << *p << endl;
 		(*p)->run();
+		cout << "looping ran" << *p << endl;
 		gp->processEvents(20);
 		if (!running)
 			break;
@@ -81,19 +98,5 @@ void g_setup::find_selected(QListViewItem* lvi)
 	else
 		find_selected(lvi->firstChild());
 	find_selected(lvi->nextSibling());
-}
-
-void node::run()
-{
-	try {
-		t();
-		emit ok();
-	} catch (assertion_error& e) {
-		emit fail(e);
-	} catch (exception& e) {
-		emit error(e);
-	} catch (...) {
-		emit error(runtime_error("Unknown exception type"));
-	}
 }
 #endif

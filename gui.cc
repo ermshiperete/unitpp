@@ -165,6 +165,21 @@ node::node(gui* gp, test& t)
 {
 	setImg();
 	item->setOpen(true);
+
+void node::run()
+{
+	try {
+		t();
+		emit ok();
+	} catch (assertion_error& e) {
+		emit fail(e);
+	} catch (exception& e) {
+		emit error(e);
+	} catch (...) {
+		emit error(runtime_error("Unknown exception type"));
+	}
+	// ### run the children
+}
 }
 gui::gui(QApplication& app, QWidget* par, const char* name)
 	: QVBox(par, name), app(app)
@@ -181,10 +196,12 @@ gui::gui(QApplication& app, QWidget* par, const char* name)
 	suites = new res_stack("Suites", f_cnts);
 	tests = new res_stack("Tests", f_cnts);
 	QHBox* hbox = behave(new QHBox(this), true, false);
-	run = new QPushButton("Run", hbox, "run");
-	stop = new QPushButton("Stop", hbox, "stop");
-	quit = new QPushButton("Quit", hbox, "quit");
-	connect(quit, SIGNAL(clicked()), &app, SLOT(quit()));
+	b_run = new QPushButton("Run", hbox, "run");
+	b_stop = new QPushButton("Stop", hbox, "stop");
+	b_quit = new QPushButton("Quit", hbox, "quit");
+	connect(b_quit, SIGNAL(clicked()), &app, SLOT(quit()));
+	connect(b_run, SIGNAL(clicked()), this, SLOT(run_pressed()));
+	connect(b_stop, SIGNAL(clicked()), this, SLOT(stop_pressed()));
 }
 
 gui::~gui() { }

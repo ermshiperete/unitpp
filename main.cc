@@ -5,11 +5,6 @@
 using namespace std;
 using namespace unitpp;
 
-#ifdef GUI
-#include "gui_hook.h"
-gui_hook ghook;	// ensure linkage of the gui stuff
-#endif
-
 namespace { 
 	bool verbose;
 }
