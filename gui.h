@@ -15,7 +15,9 @@
 #include <qpushbutton.h>
 #include <qapplication.h>
 
+/// \name unitpp
 namespace unitpp {
+/// A colored count with a unit.
 class cnt_item : public QHBox
 {
 	Q_OBJECT
@@ -31,6 +33,7 @@ public slots:
 	void inc();
 };
 
+/// A line with total, ok, fail, and error counts.
 class cnt_line : public QHBox
 {
 	Q_OBJECT
@@ -48,6 +51,7 @@ public:
 	cnt_line(const QString& txt, QWidget* par = 0, const char* name = 0);
 };
 
+/// A cnt_line stacked with a progress bar.
 class res_stack : public QVBox
 {
 	Q_OBJECT
@@ -65,6 +69,7 @@ public:
 	res_stack(const QString& txt, QWidget* par=0, const char* name=0);
 };
 class node;
+/// The whole GUI box with test tree, results, and buttons.
 class gui : public QVBox
 {
 	Q_OBJECT
@@ -97,22 +102,35 @@ private:
 };
 class suite_node;
 // a Qt error prevents this from being a ListViewItem...
+/**
+ * A node in the test tree. An error in Qt prevents this to be derived from
+ * QListViewItem, hence the separation.
+ */
 class node : public QObject
 {
 	Q_OBJECT
 public:
 	enum state { none, is_ok, is_fail, is_error };
+	/// Create this node under par.
 	node(suite_node* par, test&);
+	/// Get the associated QListViewItem.
 	QListViewItem* lvi() { return item; }
+	///
 	state status() { return st; }
 signals:
+	/// [signal] emitted when the test succedes
 	void ok();
+	/// [signal] emitted when the test fails
 	void fail();
+	/// [signal] emitted when the test throws an exception
 	void error();
 public slots:
+	/// [slot] Make the test run, and emit appropriate signals.
 	virtual void run();
 protected:
+	/// Make a top level test, directly under the gui.
 	node(gui* par, test&);
+	/// Set the status of the node, including update of the displayed icon.
 	void status(state s) {
 		st = s;
 		setImg();
@@ -125,14 +143,21 @@ private:
 	state st;
 	void setImg();
 };
+/**
+ * A specialized node representing a test suite.
+ */
 class suite_node : public node
 {
 	typedef vector<node*> cctyp;
 	cctyp cc; // child container
 public:
+	/// Inner suite creation.
 	suite_node(suite_node* par, suite&);
+	/// Top level suite_node.
 	suite_node(gui* par, suite&);
+	/// Test.
 	virtual void run();
+	/// Register a node below this.
 	void add_child(node* n) { cc.push_back(n); }
 };
 }

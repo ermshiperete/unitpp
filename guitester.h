@@ -7,7 +7,13 @@
 #include <vector>
 #include <qobject.h>
 
+/// \name unitpp
 namespace unitpp {
+/**
+ * The class for setting up the GUI. It visites all the tests, and create
+ * nodes for them in the test tree, count them and adjust all the GUI
+ * elements appropriately.
+ */
 class g_setup : public QObject, public visitor {
 	Q_OBJECT
 private:
@@ -26,6 +32,7 @@ public:
 	virtual void visit(suite&);
 	virtual void visit(suite&, int);
 public slots:
+	///
 	void run();
 };
 }

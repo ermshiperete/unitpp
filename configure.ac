@@ -14,9 +14,11 @@ if test "$ac_use_qt" = yes; then
 	AC_PATH_QT
 	AC_DEFINE([GUI])
 	gui_vars='$(gui_objs)'
+	gui_docsrc='$(gui_docsrc)'
 	qt_lib='-lqt'
 fi
 AC_SUBST(gui_vars)
+AC_SUBST(gui_docsrc)
 AC_SUBST(qt_lib)
 
 # Checks for header files.

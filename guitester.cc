@@ -70,7 +70,6 @@ void g_setup::visit(suite& t, int)
 
 void g_setup::run()
 {
-	cout << "g_setup::run" << endl;
 	if (running)
 		return;
 	running = true;

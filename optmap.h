@@ -98,6 +98,7 @@ private:
 class opt_flag : public optmap::cmd {
 	bool& flg;
 public:
+	/// Just give it the bool you want set if the flag is present.
 	opt_flag(bool& flg) : flg(flg) {}
 	virtual bool do_cmd(optmap*) { flg = true; return true; }
 };
@@ -106,6 +107,7 @@ public:
 class opt_int : public optmap::cmd {
 	int& val;
 public:
+	/// just give it an int variable that the flag argument can be assigned to.
 	opt_int(int& val) : val(val) {}
 	virtual bool do_cmd(optmap* om);
 	virtual std::string arg() { return std::string("<int>"); }
@@ -114,6 +116,7 @@ public:
 class opt_string : public optmap::cmd {
 	std::string& val;
 public:
+	/// Give it a string that the flag arg should be assigned to.
 	opt_string(std::string& val) : val(val) {}
 	virtual bool do_cmd(optmap* om);
 	virtual std::string arg() { return std::string("<string>"); }

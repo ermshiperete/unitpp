@@ -14,15 +14,17 @@ QT_LIBDIR = @QT_LDFLAGS@
 QT_INCDIR = @QT_INCLUDES@
 MOC = @MOC@
 GUI_OBJS = @gui_vars@
+GUI_DOCSRC = @gui_docsrc@
 
 # Below here should not need modification
 TARGETLIB=libunit++.a
 TARGETHEADERS=unit++.h optmap.h
 # substituted into GUI_OBJS by autoconf, if GUI is enabled
 gui_objs = gui.o guitester.o moc_gui.o moc_guitester.o
+gui_docsrc = gui.h guitester.h
 OBJS=unit++.o tester.o main.o optmap.o $(GUI_OBJS)
 #the files with doc information
-DOCSRC=$(TARGETHEADERS) main.h tester.h
+DOCSRC=$(TARGETHEADERS) main.h tester.h $(GUI_DOCSRC)
 DOCOPTS=-d $(docdir)
 TSTOBJS=Test_unit++.o Test_optmap.o Test_gui.o
 TSTLIBS=-L. -lunit++

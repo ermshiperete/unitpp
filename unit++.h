@@ -89,9 +89,11 @@ template<typename C>
 class test_mfun : public test {
 public:
 	typedef void (C::*mfp)();
+	/// An object, a name, and a pointer to a member function.
 	test_mfun(C* par, const std::string& name, mfp fp)
 		: test(name), par(par), fp(fp)
 	{}
+	/// Executed by invoking the function in the object.
 	virtual void operator()()
 	{
 		(par->*fp)();
@@ -130,6 +132,7 @@ public:
 		: cnt(new size_t(1)), tst(new test_mfun<C>(par, name, fp))
 		{ }
 	~testcase();
+	/// Assignment that maintains reference count.
 	testcase& operator=(const testcase&);
 	void visit(visitor* vp) const { tst->visit(vp); }
 	operator test& () { return *tst; }
@@ -143,9 +146,16 @@ public:
 template<typename E>
 class exception_test : public test {
 public:
+	/**
+	 * The constructor needs a testcase to wrap. This exception_test will
+	 * fail unless the wrapped testcase generates the exception.
+	 *
+	 * The name of the exception_test is copied from the wrapped test.
+	 */
 	exception_test(const testcase& tc)
 		: test(static_cast<const test&>(tc).name()), tc(tc) {}
 	~exception_test() {}
+	/// Runs the wrapped test, and fails unless the correct exception is thrown.
 	virtual void operator()()
 	{
 		try {
@@ -200,9 +210,11 @@ public:
 	 * @return 0 if not found.
 	 */
 	virtual test* get_child(const std::string& id);
+	/// An empty implementation.
 	virtual void operator()() {}
+	/// Allow a visitor to visit a suite node of the test tree.
 	void visit(visitor*);
-	// A singleton instance of the suite class
+	/// Get a reference to the main test suite that the main program will run.
 	static suite& main();
 	// Splits the string by dots, and use each id to find a suite or test.
 	test* find(const std::string& id);
@@ -215,8 +227,7 @@ public:
  * This is a slightly extended visitor pattern implementation, intended for
  * collaboration with the Composite pattern. The aggregate node (here the
  * suite node) is visited twice, before and after the children are visited.
- * This allows different algorithms to be implemented. @see{visit}
- * @see{post-visit}
+ * This allows different algorithms to be implemented.
  */
 class visitor {
 public:
@@ -225,36 +236,47 @@ public:
 	virtual void visit(test&) = 0;
 	/// Visit a suite node before the children are visited.
 	virtual void visit(suite&) {};
-	/// @name{post-visit} Visit a suite after the children are visited
+	/**
+	 * Visit a suite after the children are visited
+	 */
 	virtual void visit(suite&, int dummy) = 0; // post childs
 };
 
-// The basic for all failed assert statements.
+/// The basic for all failed assert statements.
 class assertion_error : public std::exception
 {
 	std::string msg;
 public:
+	/// An assertion error with the given message.
 	assertion_error(const std::string& msg) : msg(msg) {}
+	///
 	std::string message() const { return msg; }
 	virtual ~assertion_error() throw () {}
 	/**
-	 * @name assertion_error::out
-	 * The virtual method used for operator>>.
+	 * The virtual method used for operator<<.
 	 */
 	virtual void out(std::ostream& os) const;
 };
-// A value comparison has failed, exception keeps expected/got.
+/**
+ * This exception represents a failed comparison between two values of types
+ * T1 and T2. Both the expected and the actually value are kept.
+ */
 template<class T1, class T2>
 class assert_value_error : public assertion_error
 {
 	T1 exp;
 	T2 got;
 public:
+	/// Construct by message, expected and gotten.
 	assert_value_error(const std::string& msg, T1& exp, T2& got)
 	: assertion_error(msg), exp(exp), got(got)
 	{
 	}
 	virtual ~assert_value_error() throw () {}
+	/**
+	 * Specialized version that requires both T1 and T2 to support
+	 * operator<<(ostream&, Tn).
+	 */
 	virtual void out(std::ostream& os) const
 	{
 		os << message() << " [expected: `" << exp << "' got: `" << got << "']";
@@ -279,8 +301,8 @@ template<class T1, class T2>
 		throw assert_value_error<T1,T2>(msg, exp, got);
 }
 /*
- * Put an assertion error to a stream, using the out method.
- * \Ref{assertion_error::out}
+ * Put an assertion error to a stream, using the out method. The out method
+ * is virtual.
  */
 inline std::ostream& operator<<(std::ostream& os, const unitpp::assertion_error& a)
 {
@@ -306,6 +328,9 @@ options_utils::optmap& options();
  * An instance of this class hooks the GUI code into the test executable.
  * Hence, make a global variable of class gui_hook to allow the -g option to
  * a test.
+ *
+ * If the library is compiled without GUI support, it is still legal to
+ * create an instance of gui_hook, but it will not add the -g option.
  */
 class gui_hook {
 public:

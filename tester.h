@@ -9,13 +9,21 @@ namespace unitpp {
 class res_cnt {
 	int ok, fail, err;
 public:
+	/// Create a 0 count.
 	res_cnt() : ok(0), fail(0), err(0) {}
+	/// Count one ok.
 	void add_ok() { ++ok; }
+	/// Count one fail.
 	void add_fail() { ++fail; }
+	/// Count one error.
 	void add_err() { ++err; }
+	/// get ok count.
 	int n_ok() { return ok; }
+	/// get fail count.
 	int n_fail() { return fail; }
+	/// get error count.
 	int n_err() { return err; }
+	/// get total count.
 	int n() { return ok+fail+err; }
 };
 /**
@@ -41,12 +49,23 @@ class tester : public visitor {
 	void write(test& t, std::exception& e);
 	void write(test& t, int dummy);
 public:
+	/**
+	 * Create a text tester.
+	 * \param os the stream to write results to.
+	 * \param verbose whether to report on succesful tests
+	 */
 	tester(std::ostream& os, bool verbose = false) : os(os), verbose(verbose) {}
+	/// Get the score for tests
 	res_cnt res_tests() { return n_test; }
+	/// Get the score for suites
 	res_cnt res_suites() { return n_suite; }
+	/// Write the summary
 	virtual void summary();
+	/// Part of the visitor pattern.
 	virtual void visit(test&);
+	/// Part of the visitor pattern.
 	virtual void visit(suite&);
+	/// Part of the visitor pattern; visit to suite after children.
 	virtual void visit(suite& t, int);
 };
 
