@@ -1,6 +1,6 @@
 // Copyright (C) 2001 Claus Dræby
 // Terms of use are in the file COPYING
-#include <sstream>
+#include <iostream>
 #include <cstdlib>
 #include "optmap.h"
 
@@ -84,28 +84,27 @@ const char* optmap::get_arg()
 
 void optmap::usage(bool abort)
 {
-	ostringstream os;
+	cerr << "usage: " << prog;
 	for (group_t::iterator p = group.begin(); p != group.end(); ++p) {
 		vector<string>& v(p->second);
 		cmd* h = p->first;
 		string arg = h->arg();
 		bool need_par = arg.size() > 0 && v.size() > 1;
 		bool first = true;
-		os << " [";
+		cerr << " [";
 		if (need_par)
-			os << "(";
+			cerr << "(";
 		for (vector<string>::iterator s = v.begin(); s != v.end(); ++s) {
-			os << (first ? " " : " | ") << (s->size() != 1 ? "--" : "-") << *s;
+			cerr << (first ? " " : " | ") << (s->size() != 1 ? "--":"-") << *s;
 			first = false;
 		}
 		if (need_par)
-			os << ")";
+			cerr << ")";
 		if (arg.size())
-			os << ' ' << arg;
-		os << " ]";
+			cerr << ' ' << arg;
+		cerr << " ]";
 	}
-	cerr << "usage: " << prog << os.str()
-	<< (tail.size() ? " " : "") << tail << endl;
+	cerr << (tail.size() ? " " : "") << tail << endl;
 	if (abort)
 		exit(1);
 }

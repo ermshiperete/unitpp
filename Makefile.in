@@ -1,11 +1,11 @@
 # installation targets
 prefix=@prefix@
 includedir=@includedir@
-libdir=@LIBDIR@
+libdir=@libdir@
 docdir=./html/unit++
 #various compilers.
 CXX=@CXX@
-CXXFLAGS=-Wall
+CXXFLAGS=@CXXFLAGS@
 # for those that have doc++, otherwise get it
 DOC=doc++
 
@@ -15,14 +15,14 @@ TARGETHEADERS=unit++.h optmap.h
 OBJS=unit++.o tester.o main.o optmap.o
 #the files with doc information
 DOCSRC=$(TARGETHEADERS) main.h tester.h
-DOCOPTS=-d $(DOCDIR)
+DOCOPTS=-d $(docdir)
 TSTOBJS=Test_unit++.o Test_optmap.o
 TSTLIBS=-L. -lunit++
 
 .SUFFIXES: .cc
 
 .cc.o:
-	$(CXX) -c $(CXXFLAGS) $(CPPFLAGS) -o $@ $<
+	$(CXX) -c $(CXXFLAGS) $(CPPFLAGS) @DEFS@ -o $@ $<
 
 all: $(TARGETLIB) test++
 
@@ -30,13 +30,13 @@ $(TARGETLIB): $(OBJS)
 	ar r $@ $(OBJS)
 
 install: $(TARGETLIB) unit++.h
-	[ -d $(INSTLIBDIR) ] || mkdir -p $(INSTLIBDIR)
-	[ -d $(INSTINCDIR) ] || mkdir -p $(INSTINCDIR)
-	cp $(TARGETLIB) $(INSTLIBDIR)
-	cp $(TARGETHEADERS) $(INSTINCDIR)
+	[ -d $(libdir) ] || mkdir -p $(libdir)
+	[ -d $(includedir) ] || mkdir -p $(includedir)
+	cp $(TARGETLIB) $(libdir)
+	cp $(TARGETHEADERS) $(includedir)
 
 doc: $(DOCSRC)
-	[ -d $(DOCDIR) ] || mkdir -p $(DOCDIR)
+	[ -d $(docdir) ] || mkdir -p $(docdir)
 	doc++ $(DOCOPTS) $(DOCSRC)
 
 test++: $(TSTOBJS) $(TARGETLIB)

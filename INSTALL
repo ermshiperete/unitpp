@@ -10,6 +10,10 @@ The all target (make all) will make the test for the test framework, test++.
 Try to run it to see that everything is fine. If you want to see a failing
 test case, try `test++ -f'.
 
+The tests can't compile on old C++ compilers, without the <sstream> header
+(stringstream classes). That includes the g++ 2.95.3 version found on
+SunOS and OpenBSD. However, newer versions of libstd++3 works fine.
+
 If you have doc++ available the API interface can be documented by `make
 doc'. The DOCDIR variable in the Makefile controls where the files end up.
 
