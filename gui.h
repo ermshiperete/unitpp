@@ -3,6 +3,7 @@
 #ifdef GUI
 #include "tester.h"
 #include <exception>
+#include <vector>
 #include <qwidget.h>
 #include <qcolor.h>
 #include <qframe.h>
@@ -148,7 +149,7 @@ private:
  */
 class suite_node : public node
 {
-	typedef vector<node*> cctyp;
+	typedef std::vector<node*> cctyp;
 	cctyp cc; // child container
 public:
 	/// Inner suite creation.
