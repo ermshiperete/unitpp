@@ -29,7 +29,7 @@ int main(int argc, const char* argv[])
 	plain_runner plain;
 	if (!runner)
 		runner = &plain;
-	return static_cast<int>(runner->run_tests(argc, argv, options().n()));
+	return runner->run_tests(argc, argv, options().n()) ? 0 : 1;
 }
 
 namespace unitpp {
