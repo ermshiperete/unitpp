@@ -17,7 +17,25 @@ int main(int argc, const char* argv[]);
 
 /// @name{unitpp}
 namespace unitpp {
+class test_runner {
+public:
+	virtual ~test_runner();
+	/**
+	 * run all the tests with arguments in the argc, argv set, starting at i.
+	 */
+	virtual bool run_tests(int argc, const char** argv, int i) = 0;
+};
+/**
+ * Sets the test_runner to be used in testing. This hook allows another
+ * tester to hook into the main function and replace the traditional tester.
+ */
+void set_tester(test_runner*);
 
+/// A palin test runner for the ordinary text version.
+class plain_runner : public test_runner {
+public:
+	virtual bool run_tests(int argc, const char** argv, int i);
+private:
 /**
  * @name{run_test-id}
  * Run a test found in the suite::main() test by id. If id is empty run the
@@ -29,4 +47,5 @@ bool run_test(const string& id = "");
 bool run_test(test*);
 /// find the test with the given id
 test* find_test(const string& id);
+};
 }

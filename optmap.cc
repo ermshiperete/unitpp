@@ -22,6 +22,8 @@ optmap& optmap::add(const char* c, cmd* h)
 	if (cmds.find(c) != cmds.end())
 		throw invalid_argument(string("duplicated option: ")+c);
 	cmds[c] = h;
+	if (group[h].size() == 0)
+		gvec.push_back(h);
 	group[h].push_back(c);
 	return *this;
 }
@@ -85,9 +87,9 @@ const char* optmap::get_arg()
 void optmap::usage(bool abort)
 {
 	cerr << "usage: " << prog;
-	for (group_t::iterator p = group.begin(); p != group.end(); ++p) {
-		vector<string>& v(p->second);
-		cmd* h = p->first;
+	for (gvec_t::iterator p = gvec.begin(); p != gvec.end(); ++p) {
+		cmd* h = *p;
+		vector<string>& v(group[h]);
 		string arg = h->arg();
 		bool need_par = arg.size() > 0 && v.size() > 1;
 		bool first = true;

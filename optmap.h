@@ -88,6 +88,8 @@ private:
 	std::string tail;
 	typedef std::map<std::string, cmd*> cmds_t;
 	cmds_t cmds;
+	typedef std::vector<cmd*> gvec_t;
+	gvec_t gvec;
 	typedef std::map<cmd*, std::vector<std::string> > group_t;
 	group_t group;
 };

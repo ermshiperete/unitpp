@@ -8,11 +8,18 @@ CXX=@CXX@
 CXXFLAGS=@CXXFLAGS@
 # for those that have doc++, otherwise get it
 DOC=doc++
+#Qt related stuff
+QT_LIBDIR = @QT_LDFLAGS@
+QT_INCDIR = @QT_INCLUDES@
+MOC = @MOC@
+GUI_OBJS = @gui_vars@
 
 # Below here should not need modification
 TARGETLIB=libunit++.a
 TARGETHEADERS=unit++.h optmap.h
-OBJS=unit++.o tester.o main.o optmap.o
+# substituted into GUI_OBJS by autoconf, if GUI is enabled
+gui_objs = gui.o guitester.o moc_gui.o
+OBJS=unit++.o tester.o main.o optmap.o $(GUI_OBJS)
 #the files with doc information
 DOCSRC=$(TARGETHEADERS) main.h tester.h
 DOCOPTS=-d $(docdir)
@@ -22,9 +29,9 @@ TSTLIBS=-L. -lunit++
 .SUFFIXES: .cc
 
 .cc.o:
-	$(CXX) -c $(CXXFLAGS) $(CPPFLAGS) @DEFS@ -o $@ $<
+	$(CXX) -c $(CXXFLAGS) $(CPPFLAGS) @QT_INCLUDES@ @DEFS@ -o $@ $<
 
-all: $(TARGETLIB) test++
+all: $(TARGETLIB) unit++
 
 $(TARGETLIB): $(OBJS)
 	ar r $@ $(OBJS)
@@ -39,14 +46,16 @@ doc: $(DOCSRC)
 	[ -d $(docdir) ] || mkdir -p $(docdir)
 	doc++ $(DOCOPTS) $(DOCSRC)
 
-test++: $(TSTOBJS) $(TARGETLIB)
-	$(CXX) -o $@ $(TSTOBJS) $(TSTLIBS)
+unit++: $(TSTOBJS) $(TARGETLIB)
+	$(CXX) -o $@ $(TSTOBJS) $(TSTLIBS) @QT_LDFLAGS@ @qt_lib@
 
+moc_gui.cc: gui.h
+	$(MOC) $< -o $@
 clean:
 	rm -f $(OBJS) $(TSTOBJS)
 
 clobber: clean
-	rm -f $(TARGETLIB) test++
+	rm -f $(TARGETLIB) unit++
 
 Test_optmap.o: Test_optmap.cc unit++.h tester.h optmap.h
 Test_unit++.o: Test_unit++.cc unit++.h tester.h

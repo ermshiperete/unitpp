@@ -52,7 +52,6 @@ class Test : public suite
 			hijack s(cerr);
 			om.parse(argc, argv);
 			om.usage(false);
-			// ### this will be depend on map layout...
 			assert_eq("usage", exp, s.str());
 		}
 #endif
