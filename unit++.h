@@ -62,18 +62,23 @@ namespace unitpp {
 class visitor;
 /**
  * The heart of a test system: A test. The test is meant as a base class for
- * the tests that a clinet want performed. This means that all tests are to
+ * the tests that a client want performed. This means that all tests are to
  * be pointers dynamically allocated. However, the test system takes
  * responsibilities for freeing them again.
+ *
+ * The function call overload mechanism is used for the executable part of
+ * the test.
  */
 class test {
 	std::string nam;
 public:
+	/// A test just needs a name
 	test(const std::string& name) : nam(name) {}
 	virtual ~test() {}
+	/// The execution of the test
 	virtual void operator()() = 0;
 	virtual void visit(visitor*);
-	virtual test* get_child(const std::string& id) { return 0; }
+	virtual test* get_child(const std::string&) { return 0; }
 	std::string name() const { return nam; }
 };
 
@@ -146,7 +151,7 @@ public:
 		try {
 			(static_cast<test&>(tc))();
 			fail("unexpected lack of exception");
-		} catch (E& e) {
+		} catch (E& ) {
 			// fine!
 		}
 	}
@@ -185,15 +190,21 @@ class suite : public test {
 	std::vector<std::string> ids;
 	std::vector<testcase> tests;
 public:
+	/// Make an empty test suite.
 	suite(const std::string& name) : test(name) {}
 	virtual ~suite() {};
+	/// Add a testcase to the suite.
 	void add(const std::string& id, const testcase& t);
+	/**
+	 * Get a child with the specified id.
+	 * @return 0 if not found.
+	 */
 	virtual test* get_child(const std::string& id);
 	virtual void operator()() {}
 	void visit(visitor*);
 	// A singleton instance of the suite class
 	static suite& main();
-	/// splits the string by `.' and uses each token as a test id
+	// Splits the string by dots, and use each id to find a suite or test.
 	test* find(const std::string& id);
 };
 

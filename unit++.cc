@@ -7,6 +7,9 @@
 using namespace unitpp;
 using namespace std;
 
+#ifndef GUI
+gui_hook::gui_hook() { }
+#endif
 void test::visit(visitor* v)
 {
 	v->visit(*this);

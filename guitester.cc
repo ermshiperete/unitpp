@@ -27,12 +27,12 @@ class gui_flag : public options_utils::optmap::cmd {
 		return true;
 	}
 };
-
 gui_hook::gui_hook()
 {
 	options().add("g", new gui_flag());
 	options().alias("gui", "g");
 }
+
 
 g_setup::g_setup(gui* gp) : gp(gp), running(false), n_suites(0), n_tests(0)
 {

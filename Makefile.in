@@ -2,6 +2,7 @@
 prefix=@prefix@
 includedir=@includedir@
 libdir=@libdir@
+mandir=@mandir@
 docdir=./html/unit++
 #various compilers.
 CXX=@CXX@
@@ -39,8 +40,12 @@ $(TARGETLIB): $(OBJS)
 install: $(TARGETLIB) unit++.h
 	[ -d $(libdir) ] || mkdir -p $(libdir)
 	[ -d $(includedir) ] || mkdir -p $(includedir)
+	[ -d $(mandir)/man1 ] || mkdir -p $(mandir)/man1
+	[ -d $(mandir)/man3 ] || mkdir -p $(mandir)/man3
 	cp $(TARGETLIB) $(libdir)
 	cp $(TARGETHEADERS) $(includedir)
+	cp unit++.1 $(mandir)/man1
+	cp unit++.3 $(mandir)/man3
 
 doc: $(DOCSRC)
 	[ -d $(docdir) ] || mkdir -p $(docdir)

@@ -81,7 +81,7 @@ class Test : public suite
 		om.add("d", new opt_flag(f_d));
 		om.add("e", new opt_flag(f_e));
 		om.add("f", new opt_flag(f_f));
-		assert_true("parse", om.parse(argc, argv));
+		assert_true("parse", om.parse(static_cast<int>(argc), argv));
 		assert_eq("n", argc - 1, size_t(om.n()));
 		assert_eq("a", "bc", s);
 	}

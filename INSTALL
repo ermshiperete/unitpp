@@ -4,7 +4,8 @@ To install it:
   ./configure
   make install
 
-This should take care of everything, and install in /usr/local/{lib,include}.
+This should take care of everything, and install in
+/usr/local/{lib,include,man}.
 
 The all target (make all) will make the test for the test framework, unit++.
 Try to run it to see that everything is fine. If you want to see a failing
@@ -38,7 +39,7 @@ header (stringstream classes). That includes the g++ 2.95.3 version found on
 SunOS and OpenBSD. However, newer versions of libstd++3 works fine.
 
 This means that some things will not be tested in this case, and some
-spurious output will result from running the test++ program. The final count
+spurious output will result from running the unit++ program. The final count
 of tests is correct, even though the output strongly suggests otherwise.
 ====
 
@@ -51,3 +52,8 @@ If you want the documentation without having doc++, I try to keep it update
 on the SourceForge page: http://unitpp.sourceforge.net/docs/index.html.
 
 It can be found as a file for download there as well.
+
+Man pages
+---------
+I have added a man page for unit++(3). This documents the API to a level that
+I deem sufficient for writing test cases.

@@ -78,7 +78,10 @@ class Test : public suite
 		try {
 			assert_eq("assert_eq(char*, string)", "ok", s);
 			ok = false;
-		} catch (assert_value_error<const char*, string> e) {}
+		} catch (assert_value_error<const char*, string> e) {
+		} catch (assert_value_error<char*, string> e) { // MSVC++ bug
+		}
+
 		if (!ok)
 			fail("no exception from assert_eq(const char*, string)");
 	}

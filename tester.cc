@@ -37,7 +37,7 @@ void tester::visit(suite& t)
 	accu.push(n_test);
 }
 
-void tester::visit(suite& t, int)
+void tester::visit(suite& , int)
 {
 	res_cnt r(accu.top());
 	accu.pop();
@@ -67,7 +67,7 @@ void tester::write(test& t, std::exception& e)
 	disp(t, "ERROR");
 	os << "     : [" << typeid(e).name() << "] " << e.what() << '\n';
 }
-void tester::write(test& t, int dummy)
+void tester::write(test& t, int )
 {
 	disp(t, "ERROR");
 	os << "     : " << "unknown exception" << '\n';
