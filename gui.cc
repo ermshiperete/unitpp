@@ -1,6 +1,11 @@
+#include <algorithm>
 #include "gui.h"
 #include "unit++.h"
+#ifdef HAVE_SSTREAM
+#include <sstream>
+#endif
 using namespace unitpp;
+using namespace std;
 
 #ifdef GUI
 static const char* const img_error[] = { 
@@ -83,7 +88,7 @@ static const char* const img_empty[] = {
 
 cnt_item::cnt_item(QWidget* par, const QString& txt, const QColor& col,
 		const char* name)
-	: QHBox(par, name)
+	: QHBox(par, name), v(0)
 {
 	setSpacing(3);
 	setMargin(5);
@@ -96,9 +101,14 @@ cnt_item::cnt_item(QWidget* par, const QString& txt, const QColor& col,
 	val->setPalette(pal);
 	label = new QLabel(txt, this);
 }
-void cnt_item::value(int v)
+void cnt_item::value(int iv)
 {
+	v = iv;
 	val->setNum(v);
+}
+void cnt_item::inc()
+{
+	value(v+1);
 }
 
 cnt_line::cnt_line(const QString& txt, QWidget* par, const char* name)
@@ -115,9 +125,14 @@ cnt_line::cnt_line(const QString& txt, QWidget* par, const char* name)
 	setSizePolicy(QSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred));
 }
 
-void cnt_line::max(int m)
+void cnt_line::max(int m) { cnts[id_max]->value(m); }
+void cnt_line::inc_ok() { cnts[id_ok]->inc(); }
+void cnt_line::inc_fail() { cnts[id_fail]->inc(); }
+void cnt_line::inc_error() { cnts[id_error]->inc(); }
+void cnt_line::reset()
 {
-	cnts[0]->value(m);
+	for (int i = id_ok; i < n_id; ++i)
+		cnts[i]->value(0);
 }
 
 res_stack::res_stack(const QString& txt, QWidget* par, const char* name)
@@ -132,6 +147,27 @@ void res_stack::max(int v)
 	cnts->max(v);
 	bar->setTotalSteps(v);
 }
+void res_stack::inc_progress(bool err)
+{
+	QPalette pal(bar->palette());
+	QColorGroup cg(pal.active());
+	QColor red(255,0,0);
+	QColor green(0,244,0);
+	cg.setColor(QColorGroup::Highlight, err ? red : green);
+	cg.setColor(QColorGroup::HighlightedText, black);
+	pal.setActive(cg);
+	pal.setInactive(cg);
+	pal.setDisabled(cg);
+	bar->setPalette(pal);
+	bar->setProgress(bar->progress()+1);
+}
+void res_stack::reset() {
+	cnts->reset();
+	bar->setProgress(0);
+}
+void res_stack::inc_ok()    { cnts->inc_ok(); inc_progress(false); }
+void res_stack::inc_fail()  { cnts->inc_fail(); inc_progress(true); }
+void res_stack::inc_error() { cnts->inc_error(); inc_progress(true); }
 
 QHBox* behave(QHBox* box, bool x_expand, bool y_expand)
 {
@@ -153,11 +189,15 @@ void node::setImg()
 	static QPixmap i_err((const char**)img_error);
 	static QPixmap* imgs[] = { &i_emp, &i_ok, &i_fail, &i_err };
 	item->setPixmap(0, *(imgs[st]));
+	if (st > is_ok)
+		for (QListViewItem* ip = item; ip != 0; ip = ip->parent())
+			ip->setOpen(true);
 };
 
-node::node(node* par, test& t)
+node::node(suite_node* par, test& t)
 	: item(new QListViewItem(par->lvi(), t.name().c_str())), t(t), st(none)
 {
+	par->add_child(this);
 	setImg();
 }
 node::node(gui* gp, test& t)
@@ -165,21 +205,58 @@ node::node(gui* gp, test& t)
 {
 	setImg();
 	item->setOpen(true);
-
+}
 void node::run()
 {
+	for (QListViewItem* ip=item->firstChild(); ip != 0; ip=item->firstChild())
+		delete ip;
 	try {
 		t();
+		status(is_ok);
 		emit ok();
 	} catch (assertion_error& e) {
-		emit fail(e);
+		status(is_fail);
+		show_error(e);
+		emit fail();
 	} catch (exception& e) {
-		emit error(e);
+		status(is_error);
+		show_error(e.what());
+		emit error();
 	} catch (...) {
-		emit error(runtime_error("Unknown exception type"));
+		status(is_error);
+		show_error("unknown ... exception");
+		emit error();
 	}
-	// ### run the children
 }
+void node::show_error(assertion_error& e)
+{
+#ifdef HAVE_SSTREAM
+	ostringstream oss;
+	oss << e;
+	show_error(oss.str().c_str());
+#else
+	show_error(e.what());	// not well, but some sign
+#endif
+}
+void node::show_error(const char* msg)
+{
+	QListViewItem* elvi = new QListViewItem(item, msg);
+	elvi->setSelectable(false);
+}
+suite_node::suite_node(suite_node* par, suite& t) : node(par, t) { }
+suite_node::suite_node(gui* par, suite& t) : node(par, t) { }
+void suite_node::run()
+{
+	status(is_ok);
+	for (cctyp::iterator p = cc.begin(); p != cc.end(); ++p) {
+		(*p)->run();
+		status(max(status(), (*p)->status()));
+	}
+	switch (status()) {
+	case is_ok: emit ok(); break;
+	case is_fail: emit fail(); break;
+	case is_error: emit error(); break;
+	}
 }
 gui::gui(QApplication& app, QWidget* par, const char* name)
 	: QVBox(par, name), app(app)
@@ -209,6 +286,25 @@ gui::~gui() { }
 void gui::processEvents(int t)
 {
 	app.processEvents(t);
+}
+void gui::reset()
+{
+	tests->reset();
+	suites->reset();
+}
+void gui::nconnect(node* n, res_stack* rs)
+{
+	connect(n, SIGNAL(ok()), rs, SLOT(inc_ok()));
+	connect(n, SIGNAL(fail()), rs, SLOT(inc_fail()));
+	connect(n, SIGNAL(error()), rs, SLOT(inc_error()));
+}
+void gui::add_test(node* n)
+{
+	nconnect(n, tests);
+}
+void gui::add_suite(node* n)
+{
+	nconnect(n, suites);
 }
 
 void gui::totSuites(int v) { suites->max(v); }

@@ -2,7 +2,6 @@
 #include "optmap.h"
 #include "main.h"
 #include "guitester.h"
-#include "gui_hook.h"
 #include <qapplication.h>
 
 using namespace unitpp;
@@ -54,7 +53,8 @@ void g_setup::visit(test& t)
 void g_setup::visit(suite& t)
 {
 	++n_suites;
-	node* np = branch.size() ? new node(branch.top(), t) : new node(gp, t);
+	suite_node* np = branch.size() ? new suite_node(branch.top(), t)
+		: new suite_node(gp, t);
 	branch.push(np);
 	add_node(np);
 	gp->add_suite(np);
@@ -76,12 +76,11 @@ void g_setup::run()
 	running = true;
 	selected.clear();
 	find_selected(gp->test_tree()->firstChild());
-	cout << "g_setup::run found " << selected.size() << endl;
+	if (!selected.size())
+		selected.push_back(rev[gp->test_tree()->firstChild()]);
+	gp->reset();
 	for (vector<node*>::iterator p = selected.begin(); p!=selected.end(); ++p) {
-		cout << "looping..." << endl;
-		cout << "looping *p=" << *p << endl;
 		(*p)->run();
-		cout << "looping ran" << *p << endl;
 		gp->processEvents(20);
 		if (!running)
 			break;

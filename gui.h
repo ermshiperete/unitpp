@@ -20,6 +20,7 @@ class cnt_item : public QHBox
 {
 	Q_OBJECT
 private:
+	int v;
 	QLabel* val;
 	QLabel* label;
 public:
@@ -27,19 +28,22 @@ public:
 			const char* nam = 0);
 public slots:
 	void value(int v);
+	void inc();
 };
 
 class cnt_line : public QHBox
 {
 	Q_OBJECT
 private:
+	enum fields { id_max, id_ok, id_fail, id_error, n_id };
 	QLabel* label;
-	cnt_item* cnts[4];
+	cnt_item* cnts[n_id];
 public slots:
 	void max(int v);
-	void ok();
-	void fail();
-	void error();
+	void reset();
+	void inc_ok();
+	void inc_fail();
+	void inc_error();
 public:
 	cnt_line(const QString& txt, QWidget* par = 0, const char* name = 0);
 };
@@ -50,11 +54,13 @@ class res_stack : public QVBox
 private:
 	cnt_line* cnts;
 	QProgressBar* bar;
+	void inc_progress(bool red);
 public slots:
 	void max(int max);
-	void ok();
-	void fail();
-	void error();
+	void reset();
+	void inc_ok();
+	void inc_fail();
+	void inc_error();
 public:
 	res_stack(const QString& txt, QWidget* par=0, const char* name=0);
 };
@@ -66,8 +72,8 @@ public:
 	gui(QApplication& app, QWidget* par = 0, const char* name = 0);
 	virtual ~gui();
 	QListView* test_tree() { return tree; }
-	void add_suite(node*);
-	void add_test(node*);
+	void add_test(node* n);
+	void add_suite(node* n);
 	void processEvents(int t);
 signals:
 	void run();
@@ -75,10 +81,12 @@ signals:
 public slots:
 	void totSuites(int v);
 	void totTests(int v);
+	void reset();
 private slots:
 	void run_pressed() { emit run(); }
 	void stop_pressed() { emit stop(); }
 private:
+	void nconnect(node* node, res_stack*);
 	QApplication& app;
 	QListView* tree;
 	res_stack* suites;
@@ -87,26 +95,45 @@ private:
 	QPushButton* b_stop;
 	QPushButton* b_quit;
 };
+class suite_node;
 // a Qt error prevents this from being a ListViewItem...
 class node : public QObject
 {
 	Q_OBJECT
 public:
 	enum state { none, is_ok, is_fail, is_error };
-	node(node* par, test&);
-	node(gui* par, test&);
+	node(suite_node* par, test&);
 	QListViewItem* lvi() { return item; }
+	state status() { return st; }
 signals:
 	void ok();
-	void fail(assertion_error& err);
-	void error(const std::exception& err);
+	void fail();
+	void error();
 public slots:
-	void run();
+	virtual void run();
+protected:
+	node(gui* par, test&);
+	void status(state s) {
+		st = s;
+		setImg();
+	}
 private:
+	void show_error(assertion_error& e);
+	void show_error(const char*);
 	QListViewItem* item;
 	test& t;
 	state st;
 	void setImg();
+};
+class suite_node : public node
+{
+	typedef vector<node*> cctyp;
+	cctyp cc; // child container
+public:
+	suite_node(suite_node* par, suite&);
+	suite_node(gui* par, suite&);
+	virtual void run();
+	void add_child(node* n) { cc.push_back(n); }
 };
 }
 #endif

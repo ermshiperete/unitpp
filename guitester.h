@@ -15,7 +15,7 @@ private:
 	bool running;
 	int n_suites;
 	int n_tests;
-	std::stack<node*> branch;
+	std::stack<suite_node*> branch;
 	std::vector<node*> nodes, selected;
 	std::map<QListViewItem*, node*> rev;
 	void find_selected(QListViewItem*);

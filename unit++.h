@@ -5,6 +5,7 @@
 #include <vector>
 #include <string>
 #include <map>
+#include <iostream>
 #include "optmap.h"
 /**
  * The unitpp name space holds all the stuff needed to use the unit++ testing
@@ -15,7 +16,7 @@
 \begin{verbatim}
 #include<unit++.h>
 using namespace unitpp;
-// use anonymous namespace so all test clas
+// use anonymous namespace so all test classes can be named Test
 namespace {
 class Test : public suite {
 	void test1()
@@ -289,6 +290,16 @@ inline std::ostream& operator<<(std::ostream& os, const unitpp::assertion_error&
  * variable;
  */
 options_utils::optmap& options();
+
+/**
+ * An instance of this class hooks the GUI code into the test executable.
+ * Hence, make a global variable of class gui_hook to allow the -g option to
+ * a test.
+ */
+class gui_hook {
+public:
+	gui_hook();
+};
 
 }
 
