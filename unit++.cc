@@ -1,3 +1,5 @@
+// Copyright (C) 2001 Claus Dræby
+// Terms of use are in the file COPYING
 #include <algorithm>
 #include <functional>
 #include "unit++.h"

@@ -1,3 +1,5 @@
+// Copyright (C) 2001 Claus Dræby
+// Terms of use are in the file COPYING
 #ifndef _UNITPP_ASSERTER_H
 #define _UNITPP_ASSERTER_H
 #include <iostream>

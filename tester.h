@@ -1,3 +1,5 @@
+// Copyright (C) 2001 Claus Dræby
+// Terms of use are in the file COPYING
 #ifndef _UNITPP_TESTER_H
 #define _UNITPP_TESTER_H
 #include <stack>

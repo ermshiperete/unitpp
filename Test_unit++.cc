@@ -1,3 +1,5 @@
+// Copyright (C) 2001 Claus Dræby
+// Terms of use are in the file COPYING
 #include "unit++.h"
 #include "tester.h"
 #include "main.h"

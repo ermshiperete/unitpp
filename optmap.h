@@ -1,3 +1,5 @@
+// Copyright (C) 2001 Claus Dræby
+// Terms of use are in the file COPYING
 #ifndef __UNITPP__OPTMAP_H
 #define __UNITPP__OPTMAP_H
 #include <string>
