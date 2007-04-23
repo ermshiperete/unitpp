@@ -11,24 +11,24 @@
 namespace unitpp {
 /// A mostly internal class for keeping score.
 class res_cnt {
-	int ok, fail, err;
+	int ok, fail_, err;
 public:
 	/// Create a 0 count.
-	res_cnt() : ok(0), fail(0), err(0) {}
+	res_cnt() : ok(0), fail_(0), err(0) {}
 	/// Count one ok.
 	void add_ok() { ++ok; }
 	/// Count one fail.
-	void add_fail() { ++fail; }
+	void add_fail() { ++fail_; }
 	/// Count one error.
 	void add_err() { ++err; }
 	/// get ok count.
 	int n_ok() { return ok; }
 	/// get fail count.
-	int n_fail() { return fail; }
+	int n_fail() { return fail_; }
 	/// get error count.
 	int n_err() { return err; }
 	/// get total count.
-	int n() { return ok+fail+err; }
+	int n() { return ok+fail_+err; }
 };
 /**
  * The standard text based tester. It implements the visitor pattern for the

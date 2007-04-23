@@ -16,13 +16,13 @@ namespace {
 class test_test : public test
 {
 public:
-	enum result { succes, fail, error, exotic };
+	enum result { succes, fail_, error, exotic };
 	test_test(string name, result res = succes) : test(name), res(res) {}
 	virtual void operator()()
 	{
 		switch (res) {
 		case succes: break;
-		case fail: ::fail("test_test");
+		case fail_: fail("test_test");
 		case error: throw out_of_range("ranged");
 		case exotic: throw 4711;
 		}
@@ -88,7 +88,7 @@ class Test : public suite
 	void tester_visit()
 	{
 		out_of_range oor("negative");
-		assertion_error ae("test");
+		assertion_error ae(__FILE__, __LINE__, "test");
 #ifdef HAVE_SSTREAM
 		ostringstream os;
 		tester tst(os);
@@ -173,7 +173,7 @@ public:
 		s2->add("t20", new test_test("T20", test_test::error));
 		s2->add("t22", new test_test("T22", test_test::exotic));
 		s21->add("t210", t210 = new test_test("T210"));
-		s21->add("t211", new test_test("T211", test_test::fail));
+		s21->add("t211", new test_test("T211", test_test::fail_));
 		// 
 		// Adding testcases
 		suite::main().add("unitpp", this);
@@ -182,7 +182,7 @@ public:
 		add("assert_fail", testcase(this, "Assert fail", &Test::assert_fail));
 		add("tester_visit", testcase(this, "Visit", &Test::tester_visit));
 		add("exception", testcase(new exception_test<out_of_range>(
-			testcase(this, "gen ex", &Test::ex_test))));
+			__FILE__, __LINE__, testcase(this, "gen ex", &Test::ex_test))));
 		add("id_get", testcase(this, "Get by id", &Test::get_by_id));
 		add("vec", testcase(this, "Vectorize", &Test::vec));
 		add("empty_vec", testcase(this, "Vectorize empty", &Test::empty_vec));

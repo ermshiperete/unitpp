@@ -152,13 +152,15 @@ public:
 	 *
 	 * The name of the exception_test is copied from the wrapped test.
 	 */
-	exception_test(const testcase& tc)
-		: test(static_cast<const test&>(tc).name()), tc(tc) {}
+	exception_test(char const* f, unsigned int l, const testcase& tc)
+		: test(static_cast<const test&>(tc).name()), tc(tc), file(f), line(l) {}
 	~exception_test() {}
 	/// Runs the wrapped test, and fails unless the correct exception is thrown.
 	virtual void operator()();
 private:
 	testcase tc;
+	char const* file;
+	unsigned int line;
 };
 /**
  * Generate a testcase that expects a specific exception from the testcase it
@@ -173,7 +175,7 @@ private:
  * unless the #out_of_range# exception is generated.
  */
 template<typename E>
-testcase exception_case(const testcase& tc)
+testcase exception_case_f(const char* f, unsigned int l, const testcase& tc)
 {
 	return testcase(new exception_test<E>(tc));
 }
@@ -237,10 +239,13 @@ public:
 /// The basic for all failed assert statements.
 class assertion_error : public std::exception
 {
+	char const* file;
+	unsigned int line;
 	std::string msg;
 public:
 	/// An assertion error with the given message.
-	assertion_error(const std::string& msg) : msg(msg) {}
+	assertion_error(char const* file, unsigned int line, const std::string& msg)
+	: file(file), line(line), msg(msg) {}
 	///
 	std::string message() const { return msg; }
 	virtual ~assertion_error() throw () {}
@@ -260,8 +265,8 @@ class assert_value_error : public assertion_error
 	T2 got;
 public:
 	/// Construct by message, expected and gotten.
-	assert_value_error(const std::string& msg, T1& exp, T2& got)
-	: assertion_error(msg), exp(exp), got(got)
+	assert_value_error(const char* f, unsigned int l, const std::string& msg, T1& exp, T2& got)
+	: assertion_error(f, l, msg), exp(exp), got(got)
 	{
 	}
 	virtual ~assert_value_error() throw () {}
@@ -275,32 +280,35 @@ public:
 	}
 };
 /// The test was not succesful.
-inline void fail(const std::string& msg)
+inline void fail_f(const char* f, unsigned int l, const std::string& msg)
 {
-	throw assertion_error(msg);
+	throw assertion_error(f, l, msg);
 }
 template<typename E>
 void exception_test<E>::operator()()
 {
 	try {
 		(static_cast<test&>(tc))();
-		fail("unexpected lack of exception");
+		fail_f(file, line, "unexpected lack of exception");
 	} catch (E& ) {
 		// fine!
 	}
 }
 /// Assert that the assertion is true, that is fail #if (!assertion) ...#
-template<class A> inline void assert_true(const std::string& msg, A assertion)
+template<class A> inline void assert_true_f(char const* f, unsigned int l, const std::string& msg, A assertion)
 {
 	if (!assertion)
-		throw assertion_error(msg);
+		throw assertion_error(f, l, msg);
 }
+#define assert_true(m, a) assert_true_f(__FILE__, __LINE__, m, a)
+#define fail(m) fail_f(__FILE__, __LINE__, m)
+#define assert_eq(m, e, g) assert_eq_f(__FILE__, __LINE__, m, e, g)
 /// Assert that the two arguments are equal in the #==# sense.
 template<class T1, class T2>
-	inline void assert_eq(const std::string& msg, T1 exp, T2 got)
+	inline void assert_eq_f(char const* f, unsigned int l, const std::string& msg, T1 exp, T2 got)
 {
 	if (!(exp == got))
-		throw assert_value_error<T1,T2>(msg, exp, got);
+		throw assert_value_error<T1,T2>(f, l, msg, exp, got);
 }
 /*
  * Put an assertion error to a stream, using the out method. The out method
