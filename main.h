@@ -22,6 +22,9 @@ namespace unitpp {
  */
 extern bool verbose;
 
+/// The line and file format flag
+extern bool line_fmt;
+
 /**
  * A runner is the base class for the objects that actually processes the
  * tests from main. Main simply invokes the run_tests method of the current

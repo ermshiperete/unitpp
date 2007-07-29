@@ -239,13 +239,13 @@ public:
 /// The basic for all failed assert statements.
 class assertion_error : public std::exception
 {
-	char const* file;
-	unsigned int line;
+	char const* file_;
+	unsigned int line_;
 	std::string msg;
 public:
 	/// An assertion error with the given message.
 	assertion_error(char const* file, unsigned int line, const std::string& msg)
-	: file(file), line(line), msg(msg) {}
+	: file_(file), line_(line), msg(msg) {}
 	///
 	std::string message() const { return msg; }
 	virtual ~assertion_error() throw () {}
@@ -253,6 +253,8 @@ public:
 	 * The virtual method used for operator<<.
 	 */
 	virtual void out(std::ostream& os) const;
+	char const* file() { return file_; }
+	unsigned int line() { return line_; }
 };
 /**
  * This exception represents a failed comparison between two values of types
@@ -280,7 +282,7 @@ public:
 	}
 };
 /// The test was not succesful.
-inline void fail_f(const char* f, unsigned int l, const std::string& msg)
+inline void assert_fail_f(const char* f, unsigned int l, const std::string& msg)
 {
 	throw assertion_error(f, l, msg);
 }
@@ -289,7 +291,7 @@ void exception_test<E>::operator()()
 {
 	try {
 		(static_cast<test&>(tc))();
-		fail_f(file, line, "unexpected lack of exception");
+		assert_fail_f(file, line, "unexpected lack of exception");
 	} catch (E& ) {
 		// fine!
 	}
@@ -301,7 +303,7 @@ template<class A> inline void assert_true_f(char const* f, unsigned int l, const
 		throw assertion_error(f, l, msg);
 }
 #define assert_true(m, a) assert_true_f(__FILE__, __LINE__, m, a)
-#define fail(m) fail_f(__FILE__, __LINE__, m)
+#define assert_fail(m) assert_fail_f(__FILE__, __LINE__, m)
 #define assert_eq(m, e, g) assert_eq_f(__FILE__, __LINE__, m, e, g)
 /// Assert that the two arguments are equal in the #==# sense.
 template<class T1, class T2>

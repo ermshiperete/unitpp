@@ -16,13 +16,13 @@ namespace {
 class test_test : public test
 {
 public:
-	enum result { succes, fail_, error, exotic };
+	enum result { succes, fail, error, exotic };
 	test_test(string name, result res = succes) : test(name), res(res) {}
 	virtual void operator()()
 	{
 		switch (res) {
 		case succes: break;
-		case fail_: fail("test_test");
+		case fail: assert_fail("test_test");
 		case error: throw out_of_range("ranged");
 		case exotic: throw 4711;
 		}
@@ -45,7 +45,7 @@ class Test : public suite
 		assert_eq("assert_eq(int)", 7, 7);
 		assert_eq("assert_eq(char*, string)", "ok", s);
 	}
-	void assert_fail()
+	void fail()
 	{
 		string s("fejl");
 		bool ok = true;
@@ -61,7 +61,7 @@ class Test : public suite
 #endif
 		}
 		if (!ok)
-			fail("no exception from assert_true(false)");
+			assert_fail("no exception from assert_true(false)");
 		try {
 			assert_eq("assert_eq(int)", 5, 7);
 			ok = false;
@@ -74,7 +74,7 @@ class Test : public suite
 #endif
 		}
 		if (!ok)
-			fail("no exception from assert_eq(int)");
+			assert_fail("no exception from assert_eq(int)");
 		try {
 			assert_eq("assert_eq(char*, string)", "ok", s);
 			ok = false;
@@ -83,12 +83,10 @@ class Test : public suite
 		}
 
 		if (!ok)
-			fail("no exception from assert_eq(const char*, string)");
+			assert_fail("no exception from assert_eq(const char*, string)");
 	}
 	void tester_visit()
 	{
-		out_of_range oor("negative");
-		assertion_error ae(__FILE__, __LINE__, "test");
 #ifdef HAVE_SSTREAM
 		ostringstream os;
 		tester tst(os);
@@ -156,6 +154,31 @@ class Test : public suite
 	{
 		assert_true("Fail option not set", !do_fail);
 	}
+	void test_line()
+	{
+#ifdef HAVE_SSTREAM
+		ostringstream os;
+		tester tst(os, false, true);
+#else
+		tester tst(cerr, false, true);
+#endif
+		string fname(__FILE__);
+		int l = __LINE__ + 4;
+		struct loc_test : test {
+			loc_test() : test("local") {}
+			virtual void operator()() {
+				assert_fail("failure");
+			}
+		} lc;
+		tst.visit(lc);
+#ifdef HAVE_SSTREAM
+		string r(os.str());
+		string::size_type i = r.find(':');
+		assert_eq("file name wrong", fname, r.substr(0, i));
+		string::size_type j = r.find(':', ++i);
+		assert_eq("Wrong line", l, atoi(r.substr(i, j).c_str()));
+#endif
+	}
 public:
 	Test() : suite("Unit++ test suite"), root("The root")
 	{
@@ -173,13 +196,13 @@ public:
 		s2->add("t20", new test_test("T20", test_test::error));
 		s2->add("t22", new test_test("T22", test_test::exotic));
 		s21->add("t210", t210 = new test_test("T210"));
-		s21->add("t211", new test_test("T211", test_test::fail_));
+		s21->add("t211", new test_test("T211", test_test::fail));
 		// 
 		// Adding testcases
 		suite::main().add("unitpp", this);
 		add("create", testcase(this, "Create a test", &Test::create));
 		add("assert_ok", testcase(this, "Assert ok", &Test::assert_ok));
-		add("assert_fail", testcase(this, "Assert fail", &Test::assert_fail));
+		add("fail", testcase(this, "Assert fail", &Test::fail));
 		add("tester_visit", testcase(this, "Visit", &Test::tester_visit));
 		add("exception", testcase(new exception_test<out_of_range>(
 			__FILE__, __LINE__, testcase(this, "gen ex", &Test::ex_test))));
@@ -188,6 +211,7 @@ public:
 		add("empty_vec", testcase(this, "Vectorize empty", &Test::empty_vec));
 		add("find", testcase(this, "find", &Test::find));
 		add("fail", testcase(this, "fail on option", &Test::fail_on_flag));
+		add("line", testcase(this, "line number mode", &Test::test_line));
 	}
 } * theTest = new Test();
 

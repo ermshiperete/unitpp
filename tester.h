@@ -11,24 +11,24 @@
 namespace unitpp {
 /// A mostly internal class for keeping score.
 class res_cnt {
-	int ok, fail_, err;
+	int ok, fail, err;
 public:
 	/// Create a 0 count.
-	res_cnt() : ok(0), fail_(0), err(0) {}
+	res_cnt() : ok(0), fail(0), err(0) {}
 	/// Count one ok.
 	void add_ok() { ++ok; }
 	/// Count one fail.
-	void add_fail() { ++fail_; }
+	void add_fail() { ++fail; }
 	/// Count one error.
 	void add_err() { ++err; }
 	/// get ok count.
 	int n_ok() { return ok; }
 	/// get fail count.
-	int n_fail() { return fail_; }
+	int n_fail() { return fail; }
 	/// get error count.
 	int n_err() { return err; }
 	/// get total count.
-	int n() { return ok+fail_+err; }
+	int n() { return ok+fail+err; }
 };
 /**
  * The standard text based tester. It implements the visitor pattern for the
@@ -45,6 +45,7 @@ public:
 class tester : public visitor {
 	std::ostream& os;
 	bool verbose; // list succeded tests
+	bool line_fmt; // format output with file and line
 	std::stack<res_cnt> accu;
 	res_cnt n_suite, n_test;
 	void disp(test& t, const std::string&);
@@ -58,7 +59,8 @@ public:
 	 * \param os the stream to write results to.
 	 * \param verbose whether to report on succesful tests
 	 */
-	tester(std::ostream& os, bool verbose = false) : os(os), verbose(verbose) {}
+	tester(std::ostream& os, bool verbose = false, bool line = false)
+	: os(os), verbose(verbose), line_fmt(line) {}
 	/// Get the score for tests
 	res_cnt res_tests() { return n_test; }
 	/// Get the score for suites

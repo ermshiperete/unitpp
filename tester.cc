@@ -59,6 +59,8 @@ void tester::disp(test& t, const string& status)
 }
 void tester::write(test& t, assertion_error& e)
 {
+	if (line_fmt)
+		os << e.file() << ':' << e.line() << ':';
 	disp(t, "FAIL");
 	os << e << '\n';
 }

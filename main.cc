@@ -6,6 +6,7 @@ using namespace std;
 using namespace unitpp;
 
 bool unitpp::verbose = false;
+bool unitpp::line_fmt = false;
 
 test_runner* runner = 0;
 
@@ -22,6 +23,8 @@ int main(int argc, const char* argv[])
 {
 	options().add("v", new options_utils::opt_flag(verbose));
 	options().alias("verbose", "v");
+	options().add("l", new options_utils::opt_flag(line_fmt));
+	options().alias("line", "l");
 	if (!options().parse(argc, argv))
 		options().usage();
 	plain_runner plain;
@@ -58,7 +61,7 @@ bool plain_runner::run_test(const string& id)
 }
 bool plain_runner::run_test(test* tp)
 {
-	tester tst(cout, verbose);
+	tester tst(cout, verbose, line_fmt);
 	tp->visit(&tst);
 	tst.summary();
 	res_cnt res(tst.res_tests());
