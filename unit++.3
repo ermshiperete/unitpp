@@ -91,11 +91,13 @@ the library was compiled.
 #include <unit++/unit++.h>
 using namespace std;
 using namespace unitpp;
+
+char* p = "Hej";
+string s("mor");
+
 namespace {
 	class Test : public suite
 	{
-		char* p = "Hej";
-		string s("mor");
 		void t1()
 		{
 			assert_true("pointer is not 0", p);
@@ -104,10 +106,16 @@ namespace {
 		{
 			assert_eq("Texts match", string("Mor"), s);
 		}
+		void test_n1() {
+			assert_false("wrong length", s.size() < 2);
+		}
 	public:
 		Test() : suite("Yet another test suite")
 		{
 			suite::main().add("demo", this);
+			// the new way:
+			member_test(n1);
+			// the old way:
 			add("t1", testcase(this, "T1", &Test::t1));
 			add("t2", testcase(this, "T2", &Test::t2));
 		}

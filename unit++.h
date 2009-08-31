@@ -31,17 +31,32 @@ class Test : public suite {
 	{
 		// do something that provokes exception out_of_range
 	}
+	void test_xyzzy()
+	{
+		assert_false("message", expr1); // an expression expected to yield false
+	}
+	void test_except2()
+	{
+		// do something expected to generate an out_of_range exception
+	}
 public:
 	Test() : suite("appropriate name for test suite")
 	{
+		// add the suite to the global test suite
+		suite::main().add("id", this);
 		// any setup you need
 		add("id1", testcase(this, "Test 1", &Test::test1));
 		// make a testcase from the method
 		testcase tc(this, "Test 2", &Test::test2);
 		// add a testcase that expects the exception
 		add("id2", exception_case<out_of_range>(tc));
-		// add the suite to the global test suite
-		suite::main().add("id", this);
+		// A macro for adding a test case:
+		//   requires class to be named Test and test case to be named test_<id>
+		//   hence this adds the function Test::test_xyzzy under id xyzzy:
+		member_test(xyzzy);
+		// Macro for adding exception test cases:
+		//   requirements as above
+		exception_member_test(out_of_range, except2);
 	}
 } * theTest = new Test();  // by new, since testcase claims ownership
 }
