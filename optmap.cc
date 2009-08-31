@@ -3,6 +3,7 @@
 #include <iostream>
 #include <cstdlib>
 #include "optmap.h"
+#include <string.h>
 
 using namespace std;
 using namespace options_utils;
@@ -37,6 +38,7 @@ optmap& optmap::alias(const char* new_opt, const char* old_opt)
 }
 bool optmap::parse(int c, const char** v)
 {
+	i = 1;
 	argc = c;
 	argv = v;
 	prog = argv[0];
@@ -124,8 +126,12 @@ bool optmap::do_cmd(const string& opt)
 bool opt_int::do_cmd(optmap* om)
 {
 	const char* arg = om->get_arg();
-	if (!arg)
-		return false;
+	if (!arg) {
+		if (!def_)
+			return false;
+		val = defVal_;
+		return true;
+	}
 	char* end;
 	int v = strtol(arg, &end, 10);
 	if (*end) {

@@ -3,6 +3,8 @@
 #include <typeinfo>
 #include <iostream>
 #include "tester.h"
+#include "main.h"
+
 using namespace std;
 
 using namespace unitpp;
@@ -15,18 +17,26 @@ void tester::summary()
 void tester::visit(test& t)
 {
 	try {
+		if (verbose > 1)
+			os << "Running: " << t.name() << endl;
 		t();
 		n_test.add_ok();
 		write(t);
 	} catch (assertion_error& e) {
 		n_test.add_fail();
 		write(t, e);
+		if (exit_on_error)
+			throw;
 	} catch (exception& e) {
 		n_test.add_err();
 		write(t, e);
+		if (exit_on_error)
+			throw;
 	} catch (...) {
 		n_test.add_err();
 		write(t, 0);
+		if (exit_on_error)
+			throw;
 	}
 }
 
@@ -55,7 +65,9 @@ void tester::write(test& t)
 }
 void tester::disp(test& t, const string& status)
 {
-	os << status << ": " << t.name() << endl;
+	os << status << ": ";
+	if (!line_fmt)
+		os << t.name() << endl;
 }
 void tester::write(test& t, assertion_error& e)
 {
@@ -66,11 +78,15 @@ void tester::write(test& t, assertion_error& e)
 }
 void tester::write(test& t, std::exception& e)
 {
+	if (line_fmt)
+		os << t.file() << ':' << t.line() << ':';
 	disp(t, "ERROR");
 	os << "     : [" << typeid(e).name() << "] " << e.what() << '\n';
 }
 void tester::write(test& t, int )
 {
+	if (line_fmt)
+		os << t.file() << ':' << t.line() << ':';
 	disp(t, "ERROR");
 	os << "     : " << "unknown exception" << '\n';
 }

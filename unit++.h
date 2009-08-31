@@ -6,6 +6,7 @@
 #include <string>
 #include <map>
 #include <iostream>
+#include <sstream>
 #include "optmap.h"
 /**
  * The unitpp name space holds all the stuff needed to use the unit++ testing
@@ -59,6 +60,8 @@ public:
  */
 namespace unitpp {
 
+extern int verbose;
+
 class visitor;
 /**
  * The heart of a test system: A test. The test is meant as a base class for
@@ -70,16 +73,20 @@ class visitor;
  * the test.
  */
 class test {
-	std::string nam;
+	std::string name_;
+	char const* file_;
+	unsigned int line_;
 public:
 	/// A test just needs a name
-	test(const std::string& name) : nam(name) {}
+	test(const std::string& name, char const* f = "", unsigned int l = 0) : name_(name), file_(f), line_(l) {}
 	virtual ~test() {}
 	/// The execution of the test
 	virtual void operator()() = 0;
 	virtual void visit(visitor*);
 	virtual test* get_child(const std::string&) { return 0; }
-	std::string name() const { return nam; }
+	std::string name() const { return name_; }
+	char const* file() const { return file_; }
+	unsigned int line() const { return line_; }
 };
 
 /** 
@@ -90,8 +97,8 @@ class test_mfun : public test {
 public:
 	typedef void (C::*mfp)();
 	/// An object, a name, and a pointer to a member function.
-	test_mfun(C* par, const std::string& name, mfp fp)
-		: test(name), par(par), fp(fp)
+	test_mfun(C* par, const std::string& name, mfp fp, char const* file, unsigned int line)
+		: test(name, file, line), par(par), fp(fp)
 	{}
 	/// Executed by invoking the function in the object.
 	virtual void operator()()
@@ -128,8 +135,8 @@ public:
 	 * \Ref{test_mfun}
 	 */
 	template<typename C>
-		testcase(C* par, const std::string& name, typename test_mfun<C>::mfp fp)
-		: cnt(new size_t(1)), tst(new test_mfun<C>(par, name, fp))
+		testcase(C* par, const std::string& name, typename test_mfun<C>::mfp fp, char const* file = "", unsigned int line = 0)
+		: cnt(new size_t(1)), tst(new test_mfun<C>(par, name, fp, file, line))
 		{ }
 	~testcase();
 	/// Assignment that maintains reference count.
@@ -152,15 +159,15 @@ public:
 	 *
 	 * The name of the exception_test is copied from the wrapped test.
 	 */
-	exception_test(char const* f, unsigned int l, const testcase& tc)
-		: test(static_cast<const test&>(tc).name()), tc(tc), file(f), line(l) {}
-	~exception_test() {}
+	exception_test(const testcase& tc)
+		: test(static_cast<const test&>(tc).name(),
+		       static_cast<const test&>(tc).file(),
+		       static_cast<const test&>(tc).line())
+		, tc(tc) {}
 	/// Runs the wrapped test, and fails unless the correct exception is thrown.
 	virtual void operator()();
 private:
 	testcase tc;
-	char const* file;
-	unsigned int line;
 };
 /**
  * Generate a testcase that expects a specific exception from the testcase it
@@ -175,7 +182,7 @@ private:
  * unless the #out_of_range# exception is generated.
  */
 template<typename E>
-testcase exception_case_f(const char* f, unsigned int l, const testcase& tc)
+testcase exception_case(const testcase& tc)
 {
 	return testcase(new exception_test<E>(tc));
 }
@@ -257,25 +264,20 @@ public:
 	unsigned int line() { return line_; }
 };
 /**
- * This exception represents a failed comparison between two values of types
- * T1 and T2. Both the expected and the actually value are kept.
+ * This exception represents a failed comparison between two values.
+ * Both the expected and the actually value are kept.
  */
-template<class T1, class T2>
 class assert_value_error : public assertion_error
 {
-	T1 exp;
-	T2 got;
+	std::string exp;
+	std::string got;
 public:
 	/// Construct by message, expected and gotten.
-	assert_value_error(const char* f, unsigned int l, const std::string& msg, T1& exp, T2& got)
+	assert_value_error(const char* f, unsigned int l, const std::string& msg, std::string const& exp, std::string const& got)
 	: assertion_error(f, l, msg), exp(exp), got(got)
 	{
 	}
 	virtual ~assert_value_error() throw () {}
-	/**
-	 * Specialized version that requires both T1 and T2 to support
-	 * operator<<(ostream&, Tn).
-	 */
 	virtual void out(std::ostream& os) const
 	{
 		os << message() << " [expected: `" << exp << "' got: `" << got << "']";
@@ -291,7 +293,7 @@ void exception_test<E>::operator()()
 {
 	try {
 		(static_cast<test&>(tc))();
-		assert_fail_f(file, line, "unexpected lack of exception");
+		assert_fail_f(file(), line(), "unexpected lack of exception");
 	} catch (E& ) {
 		// fine!
 	}
@@ -299,18 +301,38 @@ void exception_test<E>::operator()()
 /// Assert that the assertion is true, that is fail #if (!assertion) ...#
 template<class A> inline void assert_true_f(char const* f, unsigned int l, const std::string& msg, A assertion)
 {
+	if (verbose > 2)
+		std::cerr << "assert_true: " << f << ':' << l << std::endl;
 	if (!assertion)
 		throw assertion_error(f, l, msg);
 }
+/// Assert that the assertion is false, that is fail #if (assertion) ...#
+template<class A> inline void assert_false_f(char const* f, unsigned int l, const std::string& msg, A assertion)
+{
+	if (verbose > 2)
+		std::cerr << "assert_false: " << f << ':' << l << std::endl;
+	if (assertion)
+		throw assertion_error(f, l, msg);
+}
+#define member_testcase(func) testcase(this, #func, &Test::test_##func, __FILE__, __LINE__)
 #define assert_true(m, a) assert_true_f(__FILE__, __LINE__, m, a)
+#define assert_false(m, a) assert_false_f(__FILE__, __LINE__, m, a)
 #define assert_fail(m) assert_fail_f(__FILE__, __LINE__, m)
 #define assert_eq(m, e, g) assert_eq_f(__FILE__, __LINE__, m, e, g)
+#define member_test(func) add(#func, member_testcase(func))
+#define exception_member_test(excep, func) add(#func, exception_case<excep>(member_testcase(func)))
+
 /// Assert that the two arguments are equal in the #==# sense.
 template<class T1, class T2>
 	inline void assert_eq_f(char const* f, unsigned int l, const std::string& msg, T1 exp, T2 got)
 {
-	if (!(exp == got))
-		throw assert_value_error<T1,T2>(f, l, msg, exp, got);
+	if (verbose > 2)
+		std::cerr << "assert_eq: " << f << ':' << l << std::endl;
+	if (!(exp == got)) {
+		std::ostringstream oexp; oexp << exp;
+		std::ostringstream ogot; ogot << got;
+		throw assert_value_error(f, l, msg, oexp.str(), ogot.str());
+	}
 }
 /*
  * Put an assertion error to a stream, using the out method. The out method

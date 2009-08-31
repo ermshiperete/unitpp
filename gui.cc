@@ -256,6 +256,7 @@ void suite_node::run()
 	case is_ok: emit ok(); break;
 	case is_fail: emit fail(); break;
 	case is_error: emit error(); break;
+	default: break;
 	}
 }
 gui::gui(QApplication& app, QWidget* par, const char* name)

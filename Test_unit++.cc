@@ -8,6 +8,7 @@
 #else
 #include <iostream>
 #endif
+#include <stdlib.h>
 using namespace std;
 using namespace unitpp;
 namespace {
@@ -65,7 +66,7 @@ class Test : public suite
 		try {
 			assert_eq("assert_eq(int)", 5, 7);
 			ok = false;
-		} catch (assert_value_error<int,int> e) {
+		} catch (assert_value_error& e) {
 #ifdef HAVE_SSTREAM
 			ostringstream oss;
 			oss << e;
@@ -78,8 +79,7 @@ class Test : public suite
 		try {
 			assert_eq("assert_eq(char*, string)", "ok", s);
 			ok = false;
-		} catch (assert_value_error<const char*, string> e) {
-		} catch (assert_value_error<char*, string> e) { // MSVC++ bug
+		} catch (assert_value_error& e) {
 		}
 
 		if (!ok)
@@ -102,6 +102,10 @@ class Test : public suite
 		assert_eq("suites fail", 1, tst.res_suites().n_fail());
 	}
 	void ex_test()
+	{
+		throw out_of_range("expected");
+	}
+	void test_exception()
 	{
 		throw out_of_range("expected");
 	}
@@ -179,6 +183,10 @@ class Test : public suite
 		assert_eq("Wrong line", l, atoi(r.substr(i, j).c_str()));
 #endif
 	}
+	void test_macro()
+	{
+		assert_true("true", true);
+	}
 public:
 	Test() : suite("Unit++ test suite"), root("The root")
 	{
@@ -205,13 +213,15 @@ public:
 		add("fail", testcase(this, "Assert fail", &Test::fail));
 		add("tester_visit", testcase(this, "Visit", &Test::tester_visit));
 		add("exception", testcase(new exception_test<out_of_range>(
-			__FILE__, __LINE__, testcase(this, "gen ex", &Test::ex_test))));
+			testcase(this, "gen ex", &Test::ex_test, __FILE__, __LINE__))));
+		exception_member_test(out_of_range, exception);
 		add("id_get", testcase(this, "Get by id", &Test::get_by_id));
 		add("vec", testcase(this, "Vectorize", &Test::vec));
 		add("empty_vec", testcase(this, "Vectorize empty", &Test::empty_vec));
 		add("find", testcase(this, "find", &Test::find));
 		add("fail", testcase(this, "fail on option", &Test::fail_on_flag));
 		add("line", testcase(this, "line number mode", &Test::test_line));
+		member_test(macro);
 	}
 } * theTest = new Test();
 

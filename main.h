@@ -20,10 +20,16 @@ namespace unitpp {
  * The verbose flag, in case somebody wants to piggyback it with more
  * meaning.
  */
-extern bool verbose;
+extern int verbose;
 
 /// The line and file format flag
 extern bool line_fmt;
+
+/// Generate error on likely error conditions, incl. duplicated testcase id
+extern bool pedantic;
+
+/// Exit on fail/error
+extern bool exit_on_error;
 
 /**
  * A runner is the base class for the objects that actually processes the

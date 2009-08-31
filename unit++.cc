@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <functional>
 #include "unit++.h"
+#include "main.h"
 
 using namespace unitpp;
 using namespace std;
@@ -76,6 +77,10 @@ test* suite::find(const string& id)
 }
 void suite::add(const string& id, const testcase& t)
 {
+	if (pedantic && std::find(ids.begin(), ids.end(), id) != ids.end()) {
+		cerr << "Testcase `" << id << "' already added!" << endl;
+		exit(2);
+	}
 	ids.push_back(id);
 	tests.push_back(t);
 }

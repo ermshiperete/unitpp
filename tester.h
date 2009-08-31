@@ -3,11 +3,7 @@
 #ifndef _UNITPP_TESTER_H
 #define _UNITPP_TESTER_H
 #include <stack>
-#ifdef __UNITPP
 #include "unit++.h"
-#else
-#include <unit++/unit++.h>
-#endif
 namespace unitpp {
 /// A mostly internal class for keeping score.
 class res_cnt {
@@ -44,7 +40,7 @@ public:
  */
 class tester : public visitor {
 	std::ostream& os;
-	bool verbose; // list succeded tests
+	int verbose; // list succeded tests
 	bool line_fmt; // format output with file and line
 	std::stack<res_cnt> accu;
 	res_cnt n_suite, n_test;
@@ -59,7 +55,7 @@ public:
 	 * \param os the stream to write results to.
 	 * \param verbose whether to report on succesful tests
 	 */
-	tester(std::ostream& os, bool verbose = false, bool line = false)
+	tester(std::ostream& os, int verbose = 0, bool line = false)
 	: os(os), verbose(verbose), line_fmt(line) {}
 	/// Get the score for tests
 	res_cnt res_tests() { return n_test; }

@@ -106,9 +106,12 @@ public:
 /// A cmd handler that can get an integer value.
 class opt_int : public optmap::cmd {
 	int& val;
+	bool def_;
+	int defVal_;
 public:
 	/// just give it an int variable that the flag argument can be assigned to.
-	opt_int(int& val) : val(val) {}
+	opt_int(int& val) : val(val), def_(false), defVal_(0) {}
+	opt_int(int& val, int def) : val(val), def_(true), defVal_(def) {}
 	virtual bool do_cmd(optmap* om);
 	virtual std::string arg() { return std::string("<int>"); }
 };
