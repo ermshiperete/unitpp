@@ -75,7 +75,7 @@ public:
  */
 namespace unitpp {
 
-extern int verbose;
+extern int verbose_lvl;
 
 class visitor;
 /**
@@ -316,7 +316,7 @@ void exception_test<E>::operator()()
 /// Assert that the assertion is true, that is fail #if (!assertion) ...#
 template<class A> inline void assert_true_f(char const* f, unsigned int l, const std::string& msg, A assertion)
 {
-	if (verbose > 2)
+	if (verbose_lvl > 2)
 		std::cerr << "assert_true: " << f << ':' << l << std::endl;
 	if (!assertion)
 		throw assertion_error(f, l, msg);
@@ -324,7 +324,7 @@ template<class A> inline void assert_true_f(char const* f, unsigned int l, const
 /// Assert that the assertion is false, that is fail #if (assertion) ...#
 template<class A> inline void assert_false_f(char const* f, unsigned int l, const std::string& msg, A assertion)
 {
-	if (verbose > 2)
+	if (verbose_lvl > 2)
 		std::cerr << "assert_false: " << f << ':' << l << std::endl;
 	if (assertion)
 		throw assertion_error(f, l, msg);
@@ -341,7 +341,7 @@ template<class A> inline void assert_false_f(char const* f, unsigned int l, cons
 template<class T1, class T2>
 	inline void assert_eq_f(char const* f, unsigned int l, const std::string& msg, T1 exp, T2 got)
 {
-	if (verbose > 2)
+	if (verbose_lvl > 2)
 		std::cerr << "assert_eq: " << f << ':' << l << std::endl;
 	if (!(exp == got)) {
 		std::ostringstream oexp; oexp << exp;

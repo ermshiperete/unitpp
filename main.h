@@ -17,10 +17,15 @@ int main(int argc, const char* argv[]);
 namespace unitpp {
 
 /**
+ * the original verbose flag, equivalent to -V 1
+ */
+extern bool verbose;
+
+/**
  * The verbose flag, in case somebody wants to piggyback it with more
  * meaning.
  */
-extern int verbose;
+extern int verbose_lvl;
 
 /// The line and file format flag
 extern bool line_fmt;

@@ -5,7 +5,8 @@
 using namespace std;
 using namespace unitpp;
 
-int unitpp::verbose = 0;
+bool unitpp::verbose = false;
+int unitpp::verbose_lvl = 0;
 bool unitpp::line_fmt = false;
 bool unitpp::pedantic = false;
 bool unitpp::exit_on_error = false;
@@ -23,8 +24,10 @@ void unitpp::set_tester(test_runner* tr)
 
 int main(int argc, const char* argv[])
 {
-	options().add("v", new options_utils::opt_int(verbose, 1));
+	options().add("v", new options_utils::opt_flag(verbose));
 	options().alias("verbose", "v");
+	options().add("V", new options_utils::opt_int(verbose_lvl, 1));
+	options().alias("verbose-lvl", "V");
 	options().add("l", new options_utils::opt_flag(line_fmt));
 	options().alias("line", "l");
 	options().add("p", new options_utils::opt_flag(pedantic));
@@ -67,7 +70,9 @@ bool plain_runner::run_test(const string& id)
 }
 bool plain_runner::run_test(test* tp)
 {
-	tester tst(cout, verbose, line_fmt);
+	if (verbose)
+		verbose_lvl = 1;
+	tester tst(cout, verbose_lvl, line_fmt);
 	try {
 		tp->visit(&tst);
 	} catch(...) {
