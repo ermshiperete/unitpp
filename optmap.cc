@@ -2,6 +2,7 @@
 // Terms of use are in the file COPYING
 #include <iostream>
 #include <cstdlib>
+#include <cstring>
 #include "optmap.h"
 #include <string.h>
 

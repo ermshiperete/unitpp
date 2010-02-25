@@ -1,4 +1,4 @@
-// Copyright (C) 2001 Claus Dræby
+// Copyright (C) 2001 Claus Drby
 // Terms of use are in the file COPYING
 #include "unit++.h"
 #include "tester.h"
@@ -12,6 +12,8 @@
 using namespace std;
 using namespace unitpp;
 namespace {
+
+int g_global1 = 0;
 
 // a test case that can fail with any exception
 class test_test : public test
@@ -35,6 +37,9 @@ private:
 // The test suite for the unit++ library
 class Test : public suite
 {
+	int m_test1;
+	int m_suite1;
+
 	void create()
 	{
 		test_test a_loc_test("local");
@@ -187,9 +192,25 @@ class Test : public suite
 	{
 		assert_true("true", true);
 	}
+	void setup_works()
+	{
+		assert_eq("global setup", 1, g_global1);
+		assert_eq("suite setup", 1, m_suite1);
+		assert_eq("test setup", 1, m_test1);
+	}
+	void setup_works2()
+	{
+		assert_eq("global setup2", 1, g_global1);
+		assert_eq("suite setup2", 1, m_suite1);
+		assert_eq("test setup2", 1, m_test1);
+	}
+
 public:
 	Test() : suite("Unit++ test suite"), root("The root")
 	{
+		m_test1 = 0;
+		m_suite1 = 0;
+
 		do_fail = false;
 		options().add("f", new options_utils::opt_flag(do_fail));
 		options().alias("fail", "f");
@@ -222,7 +243,35 @@ public:
 		add("fail", testcase(this, "fail on option", &Test::fail_on_flag));
 		add("line", testcase(this, "line number mode", &Test::test_line));
 		member_test(macro);
+		add("setup", testcase(this, "setup works", &Test::setup_works));
+		add("setup2", testcase(this, "setup works (2)", &Test::setup_works2));
 	}
+	virtual void Setup()
+	{
+		++m_test1;
+	}
+	virtual void Teardown()
+	{
+		--m_test1;
+	}
+	virtual void SuiteSetup()
+	{
+		++m_suite1;
+	}
+	virtual void SuiteTeardown()
+	{
+		--m_suite1;
+	}
+
 } * theTest = new Test();
+
+}
+
+namespace unitpp {
+
+void GlobalSetup()
+{
+	++g_global1;
+}
 
 }

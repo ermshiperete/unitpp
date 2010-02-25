@@ -86,10 +86,14 @@ void suite::add(const string& id, const testcase& t)
 }
 void suite::visit(visitor* v)
 {
+	SuiteSetup();
+	fVisitingSuite = true;
 	v->visit(*this);
 	for_each(tests.begin(), tests.end(),
 		bind2nd(mem_fun_ref(&testcase::visit), v));
 	v->visit(*this, 0);
+	SuiteTeardown();
+	fVisitingSuite = false;
 }
 
 void unitpp::assertion_error::out(ostream& os) const

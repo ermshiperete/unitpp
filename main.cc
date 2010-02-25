@@ -1,4 +1,4 @@
-// Copyright (C) 2001 Claus Dræby
+// Copyright (C) 2001 Claus Drby
 // Terms of use are in the file COPYING
 #include "main.h"
 #include <algorithm>
@@ -39,7 +39,10 @@ int main(int argc, const char* argv[])
 	plain_runner plain;
 	if (!runner)
 		runner = &plain;
-	return runner->run_tests(argc, argv) ? 0 : 1;
+	GlobalSetup(verbose);
+	int retval = runner->run_tests(argc, argv) ? 0 : 1;
+	GlobalTeardown();
+	return retval;
 }
 
 namespace unitpp {

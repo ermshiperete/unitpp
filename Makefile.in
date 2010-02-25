@@ -1,3 +1,5 @@
+datarootdir = @datarootdir@
+VPATH=@srcdir@
 # installation targets
 prefix=@prefix@
 includedir=@includedir@
@@ -23,7 +25,8 @@ TARGETHEADERS=unit++.h optmap.h gui.h guitester.h main.h tester.h
 # substituted into GUI_OBJS by autoconf, if GUI is enabled
 gui_objs = gui.o guitester.o moc_gui.o moc_guitester.o
 gui_docsrc = gui.h guitester.h
-OBJS=unit++.o tester.o main.o optmap.o $(GUI_OBJS)
+OBJS=unit++.o tester.o main.o optmap.o GlobalSetup.o GlobalTeardown.o\
+ $(GUI_OBJS)
 #the files with doc information
 DOCSRC=$(TARGETHEADERS) main.h tester.h $(GUI_DOCSRC)
 DOCOPTS=-d $(docdir)
@@ -78,3 +81,5 @@ main.o: main.cc main.h tester.h unit++.h optmap.h
 optmap.o: optmap.cc optmap.h
 tester.o: tester.cc tester.h unit++.h optmap.h
 unit++.o: unit++.cc unit++.h optmap.h
+GlobalSetup.o: GlobalSetup.cc unit++.h optmap.h
+GlobalTeardown.o: GlobalTeardown.cc unit++.h optmap.h

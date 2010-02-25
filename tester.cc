@@ -12,7 +12,7 @@ using namespace unitpp;
 void tester::summary()
 {
 	os << "Tests [Ok-Fail-Error]: [" << n_test.n_ok() << '-'
-	<< n_test.n_fail() << '-' << n_test.n_err() << "]\n";
+	<< n_test.n_fail() << '-' << n_test.n_err() << "]" << endl;
 }
 void tester::visit(test& t)
 {
@@ -74,19 +74,19 @@ void tester::write(test& t, assertion_error& e)
 	if (line_fmt)
 		os << e.file() << ':' << e.line() << ':';
 	disp(t, "FAIL");
-	os << e << '\n';
+	os << e << endl;
 }
 void tester::write(test& t, std::exception& e)
 {
 	if (line_fmt)
 		os << t.file() << ':' << t.line() << ':';
 	disp(t, "ERROR");
-	os << "     : [" << typeid(e).name() << "] " << e.what() << '\n';
+	os << "     : [" << typeid(e).name() << "] " << e.what() << endl;
 }
 void tester::write(test& t, int )
 {
 	if (line_fmt)
 		os << t.file() << ':' << t.line() << ':';
 	disp(t, "ERROR");
-	os << "     : " << "unknown exception" << '\n';
+	os << "     : " << "unknown exception" << endl;
 }

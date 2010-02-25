@@ -1,4 +1,4 @@
-// Copyright (C) 2001 Claus Dræby
+// Copyright (C) 2001 Claus Drï¿½by
 // Terms of use are in the file COPYING
 #ifndef __TEST_FW_H_
 #define __TEST_FW_H_
@@ -102,6 +102,17 @@ public:
 	std::string name() const { return name_; }
 	char const* file() const { return file_; }
 	unsigned int line() const { return line_; }
+	/// Initialize before executing a test.  The default method does nothing.
+	virtual void Setup() {}
+	/// Cleanup after executing a test.  The default method does nothing.
+	virtual void Teardown() {}
+	/// Initialize before running a test suite.  The default method does nothing.
+	virtual void SuiteSetup() {}
+	/// Cleanup after running a test suite.  The default method does nothing.
+	virtual void SuiteTeardown() {}
+	virtual bool IsVisitingSuite() { return false; }
+	// this calls Teardown() and possibly SuiteTeardown().
+	virtual void cleanup() {}
 };
 
 /** 
@@ -118,7 +129,27 @@ public:
 	/// Executed by invoking the function in the object.
 	virtual void operator()()
 	{
-		(par->*fp)();
+		// In case we're running an isolated test out of a suite.
+		if (!par->IsVisitingSuite())
+			par->SuiteSetup();
+		par->Setup();
+		try
+		{
+			(par->*fp)();
+		}
+		catch (...)
+		{
+			cleanup();
+			throw;			// pass on the exception
+		}
+		cleanup();
+	}
+	// This is a separate method for use by exception_test::operator()
+	virtual void cleanup()
+	{
+		par->Teardown();
+		if (!par->IsVisitingSuite())
+			par->SuiteTeardown();
 	}
 private:
 	C* par;
@@ -130,7 +161,7 @@ private:
  * of, and what ensures destruction.
  */
 class testcase {
-	size_t* cnt;
+	std::size_t* cnt;
 	test* tst;
 	void dec_cnt();
 public:
@@ -159,6 +190,7 @@ public:
 	void visit(visitor* vp) const { tst->visit(vp); }
 	operator test& () { return *tst; }
 	operator const test& () const { return *tst; }
+	test * Test() { return tst; }
 };
 
 /**
@@ -217,7 +249,7 @@ class suite : public test {
 	std::vector<testcase> tests;
 public:
 	/// Make an empty test suite.
-	suite(const std::string& name) : test(name) {}
+	suite(const std::string& name) : test(name) { fVisitingSuite = false; }
 	virtual ~suite() {};
 	/// Add a testcase to the suite.
 	void add(const std::string& id, const testcase& t);
@@ -234,6 +266,9 @@ public:
 	static suite& main();
 	// Splits the string by dots, and use each id to find a suite or test.
 	test* find(const std::string& id);
+	virtual bool IsVisitingSuite() { return fVisitingSuite; }
+private:
+	bool fVisitingSuite;
 };
 
 /**
@@ -386,6 +421,18 @@ public:
 	gui_hook();
 };
 
+/**
+ *  This function performs global initialization before any tests are run.
+ *  It is called from main().  Programmers can supply their own implementation,
+ *  or rely on the default null implementation in the library.
+ */
+void GlobalSetup(bool verbose);
+/**
+ *  This function performs global cleanup after all tests have been run.
+ *  It is called from main().  Programmers can supply their own implementation,
+ *  or rely on the default null implementation in the library.
+ */
+void GlobalTeardown();
 }
 
 #endif
