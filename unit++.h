@@ -1,4 +1,4 @@
-// Copyright (C) 2001 Claus Dr�by
+// Copyright (C) 2001 Claus Dræby
 // Terms of use are in the file COPYING
 #ifndef __TEST_FW_H_
 #define __TEST_FW_H_

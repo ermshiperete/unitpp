@@ -1,4 +1,4 @@
-// Copyright (C) 2001 Claus Dræby
+// Copyright (C) 2001 Claus DrÃ¦by
 // Terms of use are in the file COPYING
 #include <iostream>
 #include <cstdlib>
