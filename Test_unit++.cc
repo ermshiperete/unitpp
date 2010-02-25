@@ -269,7 +269,7 @@ public:
 
 namespace unitpp {
 
-void GlobalSetup()
+void GlobalSetup(bool verbose)
 {
 	++g_global1;
 }
