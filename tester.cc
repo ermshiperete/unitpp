@@ -2,6 +2,7 @@
 // Terms of use are in the file COPYING
 #include <typeinfo>
 #include <iostream>
+#include <signal.h>
 #include "tester.h"
 #include "main.h"
 
@@ -9,13 +10,24 @@ using namespace std;
 
 using namespace unitpp;
 
+bool unitpp::test_aborted = false;
+
 void tester::summary()
 {
 	os << "Tests [Ok-Fail-Error]: [" << n_test.n_ok() << '-'
 	<< n_test.n_fail() << '-' << n_test.n_err() << "]" << endl;
 }
+
+void sigabrtproc(int)
+{
+	test_aborted = true;
+}
+
 void tester::visit(test& t)
 {
+	test_aborted = false;
+	signal(SIGABRT, sigabrtproc);
+
 	try {
 		if (verbose > 1)
 			os << "Running: " << t.name() << endl;
@@ -35,6 +47,13 @@ void tester::visit(test& t)
 	} catch (...) {
 		n_test.add_err();
 		write(t, 0);
+		if (exit_on_error)
+			throw;
+	}
+	if (test_aborted) {
+		n_test.add_err();
+		std::logic_error ex("got SIGABRT");
+		write(t, ex);
 		if (exit_on_error)
 			throw;
 	}
@@ -60,8 +79,11 @@ void tester::visit(suite& , int)
 }
 void tester::write(test& t)
 {
-	if (verbose)
+	if (verbose) {
 		disp(t, "OK");
+		if (line_fmt)
+			os << t.name() << endl;
+	}
 }
 void tester::disp(test& t, const string& status)
 {

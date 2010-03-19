@@ -5,6 +5,10 @@
 #include <stack>
 #include "unit++.h"
 namespace unitpp {
+
+/// true if we got SIGABRT while running test
+extern bool test_aborted;
+
 /// A mostly internal class for keeping score.
 class res_cnt {
 	int ok, fail, err;
