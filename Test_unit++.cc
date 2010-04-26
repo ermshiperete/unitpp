@@ -182,7 +182,12 @@ class Test : public suite
 		tst.visit(lc);
 #ifdef HAVE_SSTREAM
 		string r(os.str());
+#ifdef WIN32
+		// skip over c:
+		string::size_type i = r.find(':', 2);
+#else
 		string::size_type i = r.find(':');
+#endif
 		assert_eq("file name wrong", fname, r.substr(0, i));
 		string::size_type j = r.find(':', ++i);
 		assert_eq("Wrong line", l, atoi(r.substr(i, j).c_str()));
