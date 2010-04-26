@@ -82,21 +82,21 @@ void tester::write(test& t)
 	if (verbose) {
 		disp(t, "OK");
 		if (line_fmt)
-			os << t.name() << endl;
+			os << endl;
 	}
 }
 void tester::disp(test& t, const string& status)
 {
-	os << status << ": ";
+	os << status << ": " << t.name();
 	if (!line_fmt)
-		os << t.name() << endl;
+		os << endl;
 }
 void tester::write(test& t, assertion_error& e)
 {
 	if (line_fmt)
 		os << e.file() << ':' << e.line() << ':';
 	disp(t, "FAIL");
-	os << e << endl;
+	os << ": " << e << endl;
 }
 void tester::write(test& t, std::exception& e)
 {
